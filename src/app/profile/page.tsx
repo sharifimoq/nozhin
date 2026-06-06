@@ -2,6 +2,12 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
+type Routine = {
+  id: string;
+  result: string;
+  createdAt: Date;
+};
+
 export default async function Profile() {
   const session = await getServerSession();
 
@@ -14,55 +20,58 @@ export default async function Profile() {
     include: { routines: { orderBy: { createdAt: "desc" } } },
   });
 
+  const routines: Routine[] = (user as any)?.routines ?? [];
+
   return (
-    <main className="min-h-screen bg-rose-50" dir="rtl">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-rose-500">نوژین</a>
-          <nav className="flex gap-6 text-sm text-gray-600">
-            <a href="/products" className="hover:text-rose-500">محصولات</a>
-            <a href="/quiz" className="hover:text-rose-500">روتین من</a>
+    <main className="min-h-screen" style={{ background: "var(--cream)" }} dir="rtl">
+      <header style={{ background: "var(--cream)", borderBottom: "0.5px solid #E8E4DC" }} className="sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div style={{ background: "var(--sage)", borderRadius: "10px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontFamily: "var(--font-playfair)", fontSize: "16px" }}>ن</span>
+            </div>
+            <a href="/" style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", textDecoration: "none" }}>نوژین</a>
+          </div>
+          <nav className="flex gap-8 text-sm" style={{ color: "var(--mid)" }}>
+            <a href="/products" className="hover:text-black transition-colors">محصولات</a>
+            <a href="/quiz" className="hover:text-black transition-colors">روتین من</a>
           </nav>
-          <span className="text-sm text-gray-500">{user?.name}</span>
+          <span style={{ fontSize: "14px", color: "var(--mid)" }}>{user?.name}</span>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl p-6 shadow-sm mb-8 flex items-center gap-4">
-          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center text-2xl">
+      <div className="max-w-4xl mx-auto px-6 py-12">
+        <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px", marginBottom: "32px", display: "flex", alignItems: "center", gap: "16px" }}>
+          <div style={{ width: "56px", height: "56px", background: "var(--sage-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>
             👤
           </div>
-          <div>
-            <h2 className="font-bold text-gray-800 text-xl">{user?.name}</h2>
-            <p className="text-gray-400 text-sm">{user?.email}</p>
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "4px" }}>{user?.name}</h2>
+            <p style={{ fontSize: "13px", color: "var(--light)" }}>{user?.email}</p>
           </div>
-          <div className="mr-auto">
-            <a href="/quiz" className="bg-rose-500 text-white px-4 py-2 rounded-full text-sm hover:bg-rose-600">
-              روتین جدید
-            </a>
-          </div>
+          <a href="/quiz" style={{ background: "var(--sage)", color: "white", padding: "10px 20px", borderRadius: "100px", fontSize: "13px", textDecoration: "none" }}>
+            روتین جدید
+          </a>
         </div>
 
-        <h3 className="font-bold text-gray-800 text-lg mb-4">روتین‌های قبلی</h3>
+        <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", color: "var(--dark)", marginBottom: "20px" }}>روتین‌های قبلی</h3>
 
-        {user?.routines.length === 0 ? (
-          <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-            <div className="text-4xl mb-3">🌸</div>
-            <p className="text-gray-400">هنوز روتینی نداری — برو پرسشنامه رو پر کن!</p>
-            <a href="/quiz" className="inline-block mt-4 bg-rose-500 text-white px-6 py-2 rounded-full text-sm hover:bg-rose-600">
+        {routines.length === 0 ? (
+          <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "48px", textAlign: "center" }}>
+            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🌿</div>
+            <p style={{ color: "var(--light)", fontSize: "14px", marginBottom: "20px" }}>هنوز روتینی نداری — برو پرسشنامه رو پر کن!</p>
+            <a href="/quiz" style={{ background: "var(--sage)", color: "white", padding: "10px 24px", borderRadius: "100px", fontSize: "13px", textDecoration: "none" }}>
               شروع کن
             </a>
           </div>
         ) : (
-          <div className="flex flex-col gap-4">
-            {user?.routines.map((routine: { id: string; result: string; createdAt: Date }) => (
-              <div key={routine.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm text-gray-400">
-                    {new Date(routine.createdAt).toLocaleDateString("fa-IR")}
-                  </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+            {routines.map((routine) => (
+              <div key={routine.id} style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px" }}>
+                <div style={{ fontSize: "12px", color: "var(--light)", marginBottom: "16px", letterSpacing: "0.04em" }}>
+                  {new Date(routine.createdAt).toLocaleDateString("fa-IR")}
                 </div>
-                <div className="text-gray-700 leading-8 whitespace-pre-line text-sm">
+                <div style={{ fontSize: "14px", color: "var(--mid)", lineHeight: "2", whiteSpace: "pre-line" }}>
                   {routine.result}
                 </div>
               </div>
