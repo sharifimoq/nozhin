@@ -1,6 +1,6 @@
 "use client";
 import { useCartStore } from "@/store/cartStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function Checkout() {
@@ -18,9 +18,64 @@ export default function Checkout() {
   });
   const [loading, setLoading] = useState(false);
 
+  // بعد از پرداخت موفق، سفارش رو ذخیره می‌کنیم
+  useEffect(() => {
+    if (status === "success") {
+      const savedOrder = localStorage.getItem("pendingOrder");
+      if (savedOrder) {
+        const order = JSON.parse(savedOrder);
+        fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...order, refId }),
+        });
+        localStorage.removeItem("pendingOrder");
+        clearCart();
+      }
+    }
+  }, [status]);
+
+  const handlePayment = async () => {
+    if (!form.name || !form.email || !form.mobile) {
+      alert("لطفاً همه فیلدها رو پر کن");
+      return;
+    }
+
+    setLoading(true);
+
+    // اطلاعات سفارش رو ذخیره می‌کنیم تا بعد از پرداخت بتونیم توی دیتابیس بذاریم
+    localStorage.setItem("pendingOrder", JSON.stringify({
+      name: form.name,
+      email: form.email,
+      mobile: form.mobile,
+      address: form.address,
+      total: totalPrice(),
+      items: items,
+    }));
+
+    const res = await fetch("/api/payment/request", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        amount: totalPrice(),
+        description: "خرید از فروشگاه نوژین",
+        email: form.email,
+        mobile: form.mobile,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    } else {
+      alert("خطا در ایجاد پرداخت");
+      setLoading(false);
+    }
+  };
+
   // پرداخت موفق
   if (status === "success") {
-    clearCart();
     return (
       <main className="min-h-screen bg-rose-50 flex items-center justify-center" dir="rtl">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-lg">
@@ -58,37 +113,6 @@ export default function Checkout() {
     );
   }
 
-  const handlePayment = async () => {
-    if (!form.name || !form.email || !form.mobile) {
-      alert("لطفاً همه فیلدها رو پر کن");
-      return;
-    }
-
-    setLoading(true);
-
-    // درخواست پرداخت به API می‌فرستیم
-    const res = await fetch("/api/payment/request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: totalPrice(),
-        description: "خرید از فروشگاه نوژین",
-        email: form.email,
-        mobile: form.mobile,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (data.url) {
-      // کاربر رو به صفحه پرداخت زرین‌پال می‌بریم
-      window.location.href = data.url;
-    } else {
-      alert("خطا در ایجاد پرداخت");
-      setLoading(false);
-    }
-  };
-
   return (
     <main className="min-h-screen bg-rose-50" dir="rtl">
       <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -101,8 +125,6 @@ export default function Checkout() {
 
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
-
-          {/* فرم اطلاعات */}
           <div className="flex-1 bg-white rounded-2xl p-6 shadow-sm">
             <h2 className="font-bold text-gray-800 mb-6">اطلاعات تحویل</h2>
             <div className="flex flex-col gap-4">
@@ -149,7 +171,6 @@ export default function Checkout() {
             </div>
           </div>
 
-          {/* خلاصه سفارش */}
           <div className="lg:w-72">
             <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
               <h2 className="font-bold text-gray-800 mb-4">خلاصه سفارش</h2>
@@ -174,7 +195,6 @@ export default function Checkout() {
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </main>

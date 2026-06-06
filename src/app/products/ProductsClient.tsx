@@ -1,5 +1,6 @@
 "use client";
 import { useCartStore } from "@/store/cartStore";
+import { useState } from "react";
 
 type Product = {
   id: string;
@@ -13,37 +14,65 @@ type Product = {
 
 function ProductCard({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
+  const [added, setAdded] = useState(false);
+
+  const handleAdd = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1,
+    });
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
+  };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-rose-50 hover:shadow-md transition-all">
-      <div className="bg-rose-50 rounded-t-2xl p-6 flex items-center justify-center">
+    <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", overflow: "hidden", transition: "transform 0.2s" }}
+      onMouseEnter={e => (e.currentTarget.style.transform = "translateY(-4px)")}
+      onMouseLeave={e => (e.currentTarget.style.transform = "translateY(0)")}
+    >
+      <div style={{ background: "var(--cream)", height: "180px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <img
-          src={product.image || "https://placehold.co/200x200?text=Product"}
+          src={product.image || "https://placehold.co/160x160?text="}
           alt={product.name}
-          className="w-32 h-32 object-contain"
+          style={{ width: "120px", height: "120px", objectFit: "contain" }}
         />
       </div>
-      <div className="p-5">
-        <span className="text-xs bg-rose-100 text-rose-500 px-2 py-1 rounded-full">
-          {product.category}
-        </span>
-        <h3 className="font-bold text-gray-800 mt-2 mb-1">{product.name}</h3>
-        <p className="text-gray-400 text-sm mb-4">{product.description}</p>
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-gray-800">
+      <div style={{ padding: "20px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+          <span style={{ background: "var(--sage-light)", color: "var(--sage)", fontSize: "11px", padding: "4px 12px", borderRadius: "100px", fontWeight: "500" }}>
+            {product.category}
+          </span>
+          {product.stock < 10 && (
+            <span style={{ fontSize: "11px", color: "var(--gold)" }}>موجودی محدود</span>
+          )}
+        </div>
+        <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "18px", color: "var(--dark)", marginBottom: "6px" }}>
+          {product.name}
+        </h3>
+        <p style={{ fontSize: "13px", color: "var(--light)", lineHeight: "1.6", marginBottom: "16px", fontWeight: "300" }}>
+          {product.description}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: "15px", fontWeight: "500", color: "var(--dark)" }}>
             {product.price.toLocaleString("fa-IR")} تومان
           </span>
           <button
-            onClick={() => addItem({
-              id: product.id,
-              name: product.name,
-              price: product.price,
-              image: product.image,
-              quantity: 1,
-            })}
-            className="bg-rose-500 text-white px-4 py-2 rounded-full text-sm hover:bg-rose-600"
+            onClick={handleAdd}
+            style={{
+              background: added ? "var(--sage-light)" : "var(--sage)",
+              color: added ? "var(--sage)" : "white",
+              border: "none",
+              padding: "8px 18px",
+              borderRadius: "100px",
+              fontSize: "13px",
+              cursor: "pointer",
+              transition: "all 0.3s",
+            }}
           >
-            افزودن به سبد
+            {added ? "✓ اضافه شد" : "افزودن"}
           </button>
         </div>
       </div>
@@ -57,18 +86,28 @@ export default function ProductsClient({ products }: { products: Product[] }) {
   const totalItems = useCartStore((state) => state.totalItems);
 
   return (
-    <main className="min-h-screen bg-white" dir="rtl">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-rose-500">نوژین</a>
-          <nav className="flex gap-6 text-sm text-gray-600">
-            <a href="/products" className="text-rose-500 font-bold">محصولات</a>
-            <a href="/quiz" className="hover:text-rose-500">روتین من</a>
+    <main style={{ background: "var(--cream)", minHeight: "100vh" }} dir="rtl">
+
+      {/* هدر */}
+      <header style={{ background: "var(--cream)", borderBottom: "0.5px solid #E8E4DC" }} className="sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div style={{ background: "var(--sage)", borderRadius: "10px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontFamily: "var(--font-playfair)", fontSize: "16px" }}>ن</span>
+            </div>
+            <a href="/" style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", textDecoration: "none" }}>نوژین</a>
+          </div>
+
+          <nav className="flex gap-8 text-sm" style={{ color: "var(--mid)" }}>
+            <a href="/products" style={{ color: "var(--sage)", fontWeight: "500" }}>محصولات</a>
+            <a href="/quiz" className="hover:text-black transition-colors">روتین من</a>
+            <a href="/profile" className="hover:text-black transition-colors">پروفایل</a>
           </nav>
-          <a href="/cart" className="relative bg-rose-500 text-white px-4 py-2 rounded-full text-sm hover:bg-rose-600">
-            🛒 سبد خرید
+
+          <a href="/cart" style={{ background: "var(--sage)", color: "white", padding: "8px 20px", borderRadius: "100px", fontSize: "13px", textDecoration: "none", position: "relative" }}>
+            سبد خرید
             {totalItems() > 0 && (
-              <span className="absolute -top-2 -left-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+              <span style={{ position: "absolute", top: "-6px", left: "-6px", background: "var(--gold)", color: "white", fontSize: "10px", width: "18px", height: "18px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 {totalItems()}
               </span>
             )}
@@ -76,9 +115,24 @@ export default function ProductsClient({ products }: { products: Product[] }) {
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <section className="mb-16">
-          <h2 className="text-2xl font-bold text-gray-800 mb-8">💊 مکمل‌ها</h2>
+      <div className="max-w-6xl mx-auto px-6 py-12">
+
+        {/* عنوان صفحه */}
+        <div style={{ marginBottom: "48px", textAlign: "center" }}>
+          <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "40px", color: "var(--dark)", marginBottom: "12px" }}>
+            محصولات
+          </h1>
+          <p style={{ fontSize: "15px", color: "var(--light)", fontWeight: "300" }}>
+            انتخاب شده برای سلامت و زیبایی شما
+          </p>
+        </div>
+
+        {/* مکمل‌ها */}
+        <section style={{ marginBottom: "56px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
+            <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "26px", color: "var(--dark)" }}>مکمل‌ها</h2>
+            <div style={{ height: "0.5px", flex: 1, background: "#E8E4DC" }} />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {supplementProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
@@ -86,14 +140,19 @@ export default function ProductsClient({ products }: { products: Product[] }) {
           </div>
         </section>
 
+        {/* محصولات پوستی */}
         <section>
-          <h2 className="text-2xl font-bold text-gray-800 mb-8">🧴 محصولات پوستی</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "28px" }}>
+            <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "26px", color: "var(--dark)" }}>محصولات پوستی</h2>
+            <div style={{ height: "0.5px", flex: 1, background: "#E8E4DC" }} />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {skinProducts.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </section>
+
       </div>
     </main>
   );

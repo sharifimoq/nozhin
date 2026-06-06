@@ -9,12 +9,10 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // وقتی کاربر دکمه ورود رو می‌زنه
   const handleSubmit = async () => {
     setLoading(true);
     setError("");
 
-    // NextAuth لاگین رو مدیریت می‌کنه و session می‌سازه
     const result = await signIn("credentials", {
       email: form.email,
       password: form.password,
@@ -27,65 +25,78 @@ export default function Login() {
       return;
     }
 
-    // لاگین موفق — بره صفحه اصلی
     router.push("/");
   };
 
+  const inputStyle = {
+    width: "100%",
+    border: "0.5px solid #E8E4DC",
+    borderRadius: "12px",
+    padding: "14px 16px",
+    fontSize: "14px",
+    outline: "none",
+    fontFamily: "var(--font-inter)",
+    color: "var(--dark)",
+    background: "white",
+  };
+
   return (
-    <main className="min-h-screen bg-rose-50 flex items-center justify-center" dir="rtl">
-      <div className="bg-white rounded-3xl shadow-lg p-8 w-full max-w-md mx-4">
+    <main style={{ minHeight: "100vh", background: "var(--cream)", display: "flex", alignItems: "center", justifyContent: "center" }} dir="rtl">
+      <div style={{ width: "100%", maxWidth: "420px", margin: "0 16px" }}>
 
-        {/* لوگو */}
-        <h1 className="text-3xl font-bold text-rose-500 text-center mb-2">نوژین</h1>
-        <p className="text-gray-400 text-center mb-8">ورود به حساب کاربری</p>
-
-        {/* خطا */}
-        {error && (
-          <div className="bg-red-50 text-red-500 px-4 py-3 rounded-xl mb-4 text-sm">
-            {error}
+        <div style={{ textAlign: "center", marginBottom: "32px" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+            <div style={{ background: "var(--sage)", borderRadius: "10px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <span style={{ color: "white", fontFamily: "var(--font-playfair)", fontSize: "16px" }}>ن</span>
+            </div>
+            <span style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", color: "var(--dark)" }}>نوژین</span>
           </div>
-        )}
+          <p style={{ fontSize: "13px", color: "var(--light)", fontWeight: "300" }}>خوش برگشتی</p>
+        </div>
 
-        {/* فرم */}
-        <div className="flex flex-col gap-4">
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">ایمیل</label>
+        <div style={{ background: "white", borderRadius: "24px", border: "0.5px solid #E8E4DC", padding: "36px" }}>
+
+          {error && (
+            <div style={{ background: "#FEF2F2", color: "#DC2626", padding: "12px 16px", borderRadius: "12px", fontSize: "13px", marginBottom: "20px" }}>
+              {error}
+            </div>
+          )}
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px", letterSpacing: "0.04em" }}>ایمیل</label>
             <input
               type="email"
               placeholder="example@email.com"
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
+              style={inputStyle}
             />
           </div>
 
-          <div>
-            <label className="text-sm text-gray-600 mb-1 block">رمز عبور</label>
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px", letterSpacing: "0.04em" }}>رمز عبور</label>
             <input
               type="password"
               placeholder="رمز عبورت رو بنویس"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
-              className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
+              style={inputStyle}
             />
           </div>
 
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="w-full bg-rose-500 text-white py-3 rounded-xl hover:bg-rose-600 disabled:opacity-50 mt-2"
+            style={{ width: "100%", background: "var(--sage)", color: "white", border: "none", padding: "14px", borderRadius: "100px", fontSize: "14px", cursor: "pointer", opacity: loading ? 0.7 : 1, fontFamily: "var(--font-inter)" }}
           >
             {loading ? "در حال ورود..." : "ورود"}
           </button>
-        </div>
 
-        {/* لینک ثبت‌نام */}
-        <p className="text-center text-gray-400 text-sm mt-6">
-          حساب نداری؟{" "}
-          <a href="/register" className="text-rose-500 hover:underline">
-            ثبت‌نام کن
-          </a>
-        </p>
+          <p style={{ textAlign: "center", fontSize: "13px", color: "var(--light)", marginTop: "20px" }}>
+            حساب نداری؟{" "}
+            <a href="/register" style={{ color: "var(--sage)", textDecoration: "none" }}>ثبت‌نام کن</a>
+          </p>
+        </div>
       </div>
     </main>
   );

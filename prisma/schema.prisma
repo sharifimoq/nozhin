@@ -34,3 +34,26 @@ model Product {
   stock       Int      @default(0)
   createdAt   DateTime @default(now())
 }
+model Order {
+  id        String      @id @default(cuid())
+  userId    String?
+  name      String
+  email     String
+  mobile    String
+  address   String
+  total     Float
+  status    String      @default("pending")
+  refId     String?
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  name      String
+  price     Float
+  quantity  Int
+}

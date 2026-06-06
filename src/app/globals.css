@@ -1,3 +1,27 @@
+:root {
+  --sage: #6B8F71;
+  --sage-light: #EDF2EE;
+  --sage-mid: #A8C5AC;
+  --cream: #F7F3EC;
+  --cream-dark: #EDE8DF;
+  --gold: #B8975A;
+  --gold-light: #F5EDD9;
+  --dark: #2A2A2A;
+  --mid: #6B6B6B;
+  --light: #9A9A9A;
+  --font-display: var(--font-playfair);
+  --font-body: var(--font-inter);
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+  color: var(--dark);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-playfair), serif;
+  font-weight: 400;
+}
 @import "tailwindcss";
 
 :root {
