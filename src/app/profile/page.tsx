@@ -55,7 +55,7 @@ export default async function Profile() {
           </div>
         ) : (
           <div className="flex flex-col gap-4">
-            {user?.routines.map((routine) => (
+            {user?.routines.map((routine: { id: string; result: string; createdAt: Date }) => (
               <div key={routine.id} className="bg-white rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-sm text-gray-400">
