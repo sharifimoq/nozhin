@@ -1,13 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-// حذف محصول
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
+  
   await prisma.product.delete({
-    where: { id: params.id },
+    where: { id },
   });
 
   return NextResponse.json({ message: "محصول حذف شد" });
