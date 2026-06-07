@@ -1,24 +1,18 @@
 "use client";
+import { Suspense } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function Checkout() {
+function CheckoutContent() {
   const { items, totalPrice, clearCart } = useCartStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
   const refId = searchParams.get("ref_id");
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    mobile: "",
-    address: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", mobile: "", address: "" });
   const [loading, setLoading] = useState(false);
 
-  // بعد از پرداخت موفق، سفارش رو ذخیره می‌کنیم
   useEffect(() => {
     if (status === "success") {
       const savedOrder = localStorage.getItem("pendingOrder");
@@ -40,32 +34,17 @@ export default function Checkout() {
       alert("لطفاً همه فیلدها رو پر کن");
       return;
     }
-
     setLoading(true);
-
-    // اطلاعات سفارش رو ذخیره می‌کنیم تا بعد از پرداخت بتونیم توی دیتابیس بذاریم
     localStorage.setItem("pendingOrder", JSON.stringify({
-      name: form.name,
-      email: form.email,
-      mobile: form.mobile,
-      address: form.address,
-      total: totalPrice(),
-      items: items,
+      name: form.name, email: form.email, mobile: form.mobile,
+      address: form.address, total: totalPrice(), items: items,
     }));
-
     const res = await fetch("/api/payment/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        amount: totalPrice(),
-        description: "خرید از فروشگاه نوژین",
-        email: form.email,
-        mobile: form.mobile,
-      }),
+      body: JSON.stringify({ amount: totalPrice(), description: "خرید از فروشگاه نوژین", email: form.email, mobile: form.mobile }),
     });
-
     const data = await res.json();
-
     if (data.url) {
       window.location.href = data.url;
     } else {
@@ -74,19 +53,17 @@ export default function Checkout() {
     }
   };
 
-  // پرداخت موفق
+  const inputStyle = { width: "100%", border: "0.5px solid #E8E4DC", borderRadius: "12px", padding: "14px 16px", fontSize: "14px", outline: "none", color: "var(--dark)", background: "white" };
+
   if (status === "success") {
     return (
-      <main className="min-h-screen bg-rose-50 flex items-center justify-center" dir="rtl">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-lg">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">پرداخت موفق!</h2>
-          <p className="text-gray-400 mb-2">سفارش شما ثبت شد</p>
-          <p className="text-sm text-gray-400 mb-6">کد پیگیری: {refId}</p>
-          <button
-            onClick={() => router.push("/")}
-            className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600"
-          >
+      <main style={{ minHeight: "100vh", background: "var(--cream)", display: "flex", alignItems: "center", justifyContent: "center" }} dir="rtl">
+        <div style={{ background: "white", borderRadius: "24px", padding: "48px", maxWidth: "400px", width: "100%", textAlign: "center", border: "0.5px solid #E8E4DC" }}>
+          <div style={{ fontSize: "56px", marginBottom: "16px" }}>🎉</div>
+          <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "24px", color: "var(--dark)", marginBottom: "8px" }}>پرداخت موفق!</h2>
+          <p style={{ fontSize: "14px", color: "var(--light)", marginBottom: "8px" }}>سفارش شما ثبت شد</p>
+          <p style={{ fontSize: "12px", color: "var(--light)", marginBottom: "24px" }}>کد پیگیری: {refId}</p>
+          <button onClick={() => router.push("/")} style={{ background: "var(--sage)", color: "white", border: "none", padding: "12px 32px", borderRadius: "100px", fontSize: "14px", cursor: "pointer" }}>
             برگشت به خانه
           </button>
         </div>
@@ -94,18 +71,14 @@ export default function Checkout() {
     );
   }
 
-  // پرداخت ناموفق
   if (status === "failed") {
     return (
-      <main className="min-h-screen bg-rose-50 flex items-center justify-center" dir="rtl">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-lg">
-          <div className="text-6xl mb-4">❌</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">پرداخت ناموفق</h2>
-          <p className="text-gray-400 mb-6">مشکلی پیش اومد — دوباره امتحان کن</p>
-          <button
-            onClick={() => router.push("/cart")}
-            className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600"
-          >
+      <main style={{ minHeight: "100vh", background: "var(--cream)", display: "flex", alignItems: "center", justifyContent: "center" }} dir="rtl">
+        <div style={{ background: "white", borderRadius: "24px", padding: "48px", maxWidth: "400px", width: "100%", textAlign: "center", border: "0.5px solid #E8E4DC" }}>
+          <div style={{ fontSize: "56px", marginBottom: "16px" }}>❌</div>
+          <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "24px", color: "var(--dark)", marginBottom: "8px" }}>پرداخت ناموفق</h2>
+          <p style={{ fontSize: "14px", color: "var(--light)", marginBottom: "24px" }}>مشکلی پیش اومد — دوباره امتحان کن</p>
+          <button onClick={() => router.push("/cart")} style={{ background: "var(--sage)", color: "white", border: "none", padding: "12px 32px", borderRadius: "100px", fontSize: "14px", cursor: "pointer" }}>
             برگشت به سبد خرید
           </button>
         </div>
@@ -114,83 +87,53 @@ export default function Checkout() {
   }
 
   return (
-    <main className="min-h-screen bg-rose-50" dir="rtl">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-rose-500">نوژین</a>
-          <h1 className="text-lg font-bold text-gray-700">تکمیل خرید</h1>
-          <a href="/cart" className="text-sm text-gray-500 hover:text-rose-500">برگشت</a>
+    <main style={{ minHeight: "100vh", background: "var(--cream)" }} dir="rtl">
+      <header style={{ background: "var(--cream)", borderBottom: "0.5px solid #E8E4DC" }} className="sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <a href="/" style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", textDecoration: "none" }}>نوژین</a>
+          <h1 style={{ fontSize: "16px", fontWeight: "500", color: "var(--dark)" }}>تکمیل خرید</h1>
+          <a href="/cart" style={{ fontSize: "13px", color: "var(--mid)", textDecoration: "none" }}>برگشت</a>
         </div>
       </header>
-
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="font-bold text-gray-800 mb-6">اطلاعات تحویل</h2>
-            <div className="flex flex-col gap-4">
+          <div style={{ flex: 1, background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px" }}>
+            <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "24px" }}>اطلاعات تحویل</h2>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">نام و نام خانوادگی</label>
-                <input
-                  type="text"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
-                  placeholder="نام کامل"
-                />
+                <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px" }}>نام و نام خانوادگی</label>
+                <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} style={inputStyle} placeholder="نام کامل" />
               </div>
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">ایمیل</label>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
-                  placeholder="example@email.com"
-                />
+                <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px" }}>ایمیل</label>
+                <input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} style={inputStyle} placeholder="example@email.com" />
               </div>
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">موبایل</label>
-                <input
-                  type="tel"
-                  value={form.mobile}
-                  onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-                  className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
-                  placeholder="09xxxxxxxxx"
-                />
+                <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px" }}>موبایل</label>
+                <input type="tel" value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} style={inputStyle} placeholder="09xxxxxxxxx" />
               </div>
               <div>
-                <label className="text-sm text-gray-600 mb-1 block">آدرس</label>
-                <textarea
-                  value={form.address}
-                  onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  className="w-full border-2 border-rose-100 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-400"
-                  placeholder="آدرس کامل تحویل"
-                  rows={3}
-                />
+                <label style={{ fontSize: "12px", color: "var(--light)", display: "block", marginBottom: "8px" }}>آدرس</label>
+                <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} style={{ ...inputStyle, resize: "none" } as React.CSSProperties} placeholder="آدرس کامل تحویل" rows={3} />
               </div>
             </div>
           </div>
-
-          <div className="lg:w-72">
-            <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
-              <h2 className="font-bold text-gray-800 mb-4">خلاصه سفارش</h2>
-              <div className="flex flex-col gap-2 mb-4">
+          <div style={{ width: "280px" }}>
+            <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px", position: "sticky", top: "80px" }}>
+              <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "18px", color: "var(--dark)", marginBottom: "16px" }}>خلاصه سفارش</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "16px" }}>
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm text-gray-500">
+                  <div key={item.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "var(--mid)" }}>
                     <span>{item.name} × {item.quantity}</span>
                     <span>{(item.price * item.quantity).toLocaleString("fa-IR")}</span>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between font-bold text-gray-800 text-lg border-t pt-4">
+              <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "500", color: "var(--dark)", fontSize: "16px", borderTop: "0.5px solid #E8E4DC", paddingTop: "16px" }}>
                 <span>مبلغ کل</span>
                 <span>{totalPrice().toLocaleString("fa-IR")} تومان</span>
               </div>
-              <button
-                onClick={handlePayment}
-                disabled={loading || items.length === 0}
-                className="w-full bg-rose-500 text-white py-3 rounded-full mt-6 hover:bg-rose-600 font-bold disabled:opacity-50"
-              >
+              <button onClick={handlePayment} disabled={loading || items.length === 0} style={{ width: "100%", background: "var(--gold)", color: "white", border: "none", padding: "14px", borderRadius: "100px", fontSize: "14px", cursor: "pointer", marginTop: "20px", opacity: loading ? 0.7 : 1 }}>
                 {loading ? "در حال انتقال..." : "پرداخت با زرین‌پال"}
               </button>
             </div>
@@ -198,5 +141,13 @@ export default function Checkout() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Checkout() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", background: "var(--cream)", display: "flex", alignItems: "center", justifyContent: "center" }}>در حال بارگذاری...</div>}>
+      <CheckoutContent />
+    </Suspense>
   );
 }
