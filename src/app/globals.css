@@ -1,50 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --sage: #6B8F71;
-  --sage-light: #EDF2EE;
-  --sage-mid: #A8C5AC;
-  --cream: #F7F3EC;
-  --cream-dark: #EDE8DF;
-  --gold: #B8975A;
-  --gold-light: #F5EDD9;
-  --dark: #2A2A2A;
-  --mid: #6B6B6B;
-  --light: #9A9A9A;
-  --font-display: var(--font-playfair);
-  --font-body: var(--font-inter);
+  --cream: #FAFAF8;
+  --green-dark: #1A3A2A;
+  --green-mid: #2D6A4F;
+  --green-light: #52B788;
+  --green-pale: #D8F3DC;
+  --sand: #F4ECD8;
+  --text: #1C1C1A;
+  --text-muted: #5A5A56;
+  --border: rgba(26, 58, 42, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  font-family: 'Vazirmatn', sans-serif;
 }
 
 body {
-  font-family: var(--font-inter), sans-serif;
-  color: var(--dark);
-}
-
-h1, h2, h3 {
-  font-family: var(--font-playfair), serif;
-  font-weight: 400;
-}
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--cream);
+  color: var(--text);
+  font-family: 'Vazirmatn', sans-serif;
+  direction: rtl;
+  -webkit-font-smoothing: antialiased;
 }

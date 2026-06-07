@@ -1,106 +1,98 @@
-"use client";
-import { useRouter } from "next/navigation";
+import Link from 'next/link'
 
-export default function Home() {
-  const router = useRouter();
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen" style={{ background: "var(--cream)" }} dir="rtl">
+    <main>
+      {/* Navbar */}
+      <nav className="flex items-center justify-between px-10 py-5 border-b border-[var(--border)] bg-[var(--cream)]">
+        <span className="text-2xl font-black text-[var(--green-dark)] tracking-tight">
+          نوژ<span className="text-[var(--green-light)]">ین</span>
+        </span>
+        <ul className="flex gap-8 list-none">
+          <li><Link href="/products" className="text-sm text-[var(--text-muted)] hover:text-[var(--green-dark)]">محصولات</Link></li>
+          <li><Link href="/routine" className="text-sm text-[var(--text-muted)] hover:text-[var(--green-dark)]">روتین من</Link></li>
+          <li><Link href="/about" className="text-sm text-[var(--text-muted)] hover:text-[var(--green-dark)]">درباره ما</Link></li>
+        </ul>
+        <Link
+          href="/quiz"
+          className="bg-[var(--green-dark)] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-[var(--green-mid)] transition-colors"
+        >
+          شروع روتین
+        </Link>
+      </nav>
 
-      {/* هدر */}
-      <header style={{ background: "var(--cream)", borderBottom: "0.5px solid #E8E4DC" }} className="sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div style={{ background: "var(--sage)", borderRadius: "10px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "white", fontFamily: "var(--font-playfair)", fontSize: "16px" }}>ن</span>
-            </div>
-            <span style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)" }}>نوژین</span>
+      {/* Hero */}
+      <section className="grid grid-cols-2 gap-10 px-10 items-center min-h-[560px] bg-[var(--cream)]">
+        <div className="py-16">
+          <div className="inline-flex items-center gap-2 bg-[var(--green-pale)] text-[var(--green-mid)] text-xs font-semibold px-4 py-1.5 rounded-full mb-6">
+            <span className="w-1.5 h-1.5 bg-[var(--green-light)] rounded-full animate-pulse" />
+            روتین شخصی‌سازی‌شده با هوش مصنوعی
           </div>
-
-          <nav className="flex gap-8 text-sm" style={{ color: "var(--mid)" }}>
-            <a href="/products" className="hover:text-black transition-colors">محصولات</a>
-            <a href="/quiz" className="hover:text-black transition-colors">روتین من</a>
-            <a href="/profile" className="hover:text-black transition-colors">پروفایل</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <a href="/cart" style={{ color: "var(--mid)", fontSize: "14px" }} className="hover:text-black transition-colors">سبد خرید</a>
-            <a href="/login" style={{ background: "var(--sage)", color: "white", padding: "8px 20px", borderRadius: "100px", fontSize: "13px" }}>
-              ورود
-            </a>
-          </div>
-        </div>
-      </header>
-
-      {/* هیرو */}
-      <section className="max-w-6xl mx-auto px-6 py-24 flex flex-col items-center text-center">
-        <div style={{ background: "var(--sage-light)", color: "var(--sage)", fontSize: "12px", padding: "6px 18px", borderRadius: "100px", letterSpacing: "0.08em", marginBottom: "24px", fontWeight: "500" }}>
-          هوش مصنوعی + سلامت
-        </div>
-
-        <h1 style={{ fontFamily: "var(--font-playfair)", fontSize: "clamp(36px, 5vw, 64px)", color: "var(--dark)", lineHeight: "1.2", marginBottom: "20px", maxWidth: "700px" }}>
-          روتین شخصی شما،<br />فقط برای شما
-        </h1>
-
-        <p style={{ fontSize: "16px", color: "var(--mid)", lineHeight: "1.8", marginBottom: "36px", maxWidth: "480px", fontWeight: "300" }}>
-          با پاسخ به چند سوال ساده، روتین پوستی و مکمل مخصوص خودت رو بگیر
-        </p>
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => router.push("/quiz")}
-            style={{ background: "var(--sage)", color: "white", padding: "14px 32px", borderRadius: "100px", fontSize: "15px", border: "none", cursor: "pointer", letterSpacing: "0.02em" }}
-          >
-            شروع کن — رایگانه
-          </button>
-          <button
-            onClick={() => router.push("/products")}
-            style={{ background: "transparent", color: "var(--sage)", padding: "14px 32px", borderRadius: "100px", fontSize: "15px", border: "1px solid var(--sage)", cursor: "pointer" }}
-          >
-            محصولات
-          </button>
-        </div>
-      </section>
-
-      {/* ویژگی‌ها */}
-      <section className="max-w-6xl mx-auto px-6 pb-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div style={{ background: "white", borderRadius: "20px", padding: "32px", border: "0.5px solid #E8E4DC" }}>
-            <div style={{ fontSize: "32px", marginBottom: "16px" }}>🧴</div>
-            <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "8px" }}>روتین پوستی</h3>
-            <p style={{ fontSize: "14px", color: "var(--light)", lineHeight: "1.7", fontWeight: "300" }}>بر اساس نوع پوست و نگرانی‌های شما</p>
-          </div>
-          <div style={{ background: "white", borderRadius: "20px", padding: "32px", border: "0.5px solid #E8E4DC" }}>
-            <div style={{ fontSize: "32px", marginBottom: "16px" }}>💊</div>
-            <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "8px" }}>روتین مکمل</h3>
-            <p style={{ fontSize: "14px", color: "var(--light)", lineHeight: "1.7", fontWeight: "300" }}>مکمل‌های مناسب سبک زندگی شما</p>
-          </div>
-          <div style={{ background: "var(--sage-light)", borderRadius: "20px", padding: "32px", border: "0.5px solid var(--sage-mid)" }}>
-            <div style={{ fontSize: "32px", marginBottom: "16px" }}>🤖</div>
-            <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "8px" }}>هوش مصنوعی</h3>
-            <p style={{ fontSize: "14px", color: "var(--mid)", lineHeight: "1.7", fontWeight: "300" }}>پیشنهاد شخصی‌سازی شده با Claude AI</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ background: "var(--dark)", margin: "0 24px 48px", borderRadius: "24px" }} className="max-w-6xl mx-auto">
-        <div className="px-8 py-16 text-center">
-          <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "36px", color: "white", marginBottom: "16px" }}>
-            از کجا شروع کنم؟
-          </h2>
-          <p style={{ fontSize: "15px", color: "#9A9A9A", marginBottom: "28px", fontWeight: "300" }}>
-            فقط ۵ سوال — روتین کاملت آماده‌ست
+          <h1 className="text-5xl font-black leading-tight tracking-tighter text-[var(--green-dark)] mb-5">
+            پوست و بدنت<br/>
+            رو <span className="text-[var(--green-light)]">بشناس</span>
+          </h1>
+          <p className="text-base text-[var(--text-muted)] leading-relaxed mb-9 max-w-md">
+            با ۵ سوال ساده، روتین کاملاً اختصاصی برای پوست و سلامتت دریافت کن —
+            طراحی‌شده با هوش مصنوعی.
           </p>
-          <button
-            onClick={() => router.push("/quiz")}
-            style={{ background: "var(--gold)", color: "white", padding: "14px 36px", borderRadius: "100px", fontSize: "15px", border: "none", cursor: "pointer" }}
-          >
-            شروع پرسشنامه
-          </button>
+          <div className="flex gap-4 items-center">
+            <Link
+              href="/quiz"
+              className="bg-[var(--green-dark)] text-white text-sm font-bold px-9 py-4 rounded-full hover:bg-[var(--green-mid)] transition-colors"
+            >
+              روتین من رو بساز
+            </Link>
+            <Link href="/products" className="text-sm text-[var(--green-dark)] font-medium">
+              بیشتر بدان ←
+            </Link>
+          </div>
+        </div>
+
+        {/* Card visual placeholder */}
+        <div className="flex items-center justify-center h-[480px]">
+          <div className="relative w-[300px]">
+            <div className="absolute -top-5 right-5 -left-5 h-full bg-[var(--green-pale)] rounded-3xl border border-[rgba(82,183,136,0.3)]" />
+            <div className="relative bg-white rounded-3xl p-7 shadow-lg border border-[var(--border)]">
+              <div className="absolute -top-4 -left-4 bg-[var(--green-dark)] text-white text-xs font-semibold px-4 py-2.5 rounded-2xl shadow-lg">
+                ✦ روتین شخصی
+              </div>
+              <div className="text-[10px] font-semibold text-[var(--green-mid)] tracking-widest uppercase mb-4">روتین صبحانه شما</div>
+              {[
+                { icon: '🧴', name: 'سرم ویتامین C', sub: '۵ قطره — هر صبح', price: '۱۸۵٬۰۰۰' },
+                { icon: '☀️', name: 'ضد آفتاب SPF50', sub: 'آخرین مرحله', price: '۲۲۰٬۰۰۰' },
+                { icon: '💊', name: 'امگا ۳', sub: '۲ عدد با صبحانه', price: '۹۸٬۰۰۰' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 py-3 border-b border-[var(--border)] last:border-0">
+                  <div className="w-11 h-11 bg-[var(--green-pale)] rounded-xl flex items-center justify-center text-xl flex-shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-bold text-[var(--text)]">{item.name}</div>
+                    <div className="text-xs text-[var(--text-muted)] mt-0.5">{item.sub}</div>
+                  </div>
+                  <div className="text-sm font-bold text-[var(--green-mid)]">{item.price}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
+      {/* Stats */}
+      <div className="flex gap-3 px-10 py-7 border-t border-b border-[var(--border)] bg-white">
+        {[
+          { num: '۲۴۰۰+', label: 'روتین ساخته‌شده' },
+          { num: '۹۸٪', label: 'رضایت مشتریان' },
+          { num: '۱۲۰+', label: 'محصول معتبر' },
+          { num: '۵ دقیقه', label: 'برای دریافت روتین' },
+        ].map((s, i) => (
+          <div key={i} className="flex-1 text-center py-4">
+            <div className="text-3xl font-black text-[var(--green-dark)] tracking-tight">{s.num}</div>
+            <div className="text-xs text-[var(--text-muted)] mt-1">{s.label}</div>
+          </div>
+        ))}
+      </div>
     </main>
-  );
+  )
 }
