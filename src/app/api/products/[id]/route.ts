@@ -1,40 +1,38 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET() {
   try {
-    const { id } = await params
-    await prisma.product.delete({ where: { id: Number(id) } })
-    return NextResponse.json({ success: true })
+    const products = await prisma.product.findMany({
+      orderBy: { createdAt: 'desc' },
+    })
+    return NextResponse.json(products)
   } catch (error) {
-    return NextResponse.json({ error: 'خطا در حذف محصول' }, { status: 500 })
+    return NextResponse.json({ error: 'خطا در دریافت محصولات' }, { status: 500 })
   }
 }
 
-export async function PUT(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: Request) {
   try {
-    const { id } = await params
     const body = await request.json()
-    const { name, price, category, description, imageUrl } = body
+    const { name, price, category, description, imageUrl, stock } = body
 
-    const product = await prisma.product.update({
-      where: { id: Number(id) },
+    if (!name || !price || !category) {
+      return NextResponse.json({ error: 'نام، قیمت و دسته‌بندی الزامی است' }, { status: 400 })
+    }
+
+    const product = await prisma.product.create({
       data: {
         name,
         price: Number(price),
         category,
         description: description ?? '',
         imageUrl: imageUrl ?? null,
+        stock: Number(stock) || 0,
       },
     })
-    return NextResponse.json(product)
+    return NextResponse.json(product, { status: 201 })
   } catch (error) {
-    return NextResponse.json({ error: 'خطا در ویرایش محصول' }, { status: 500 })
+    return NextResponse.json({ error: 'خطا در ایجاد محصول' }, { status: 500 })
   }
 }

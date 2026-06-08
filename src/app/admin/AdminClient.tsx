@@ -7,7 +7,7 @@ type Product = {
   name: string;
   description: string;
   price: number;
-  image: string | null;
+  imageUrl: string | null;
   category: string;
   stock: number;
 };
@@ -32,158 +32,161 @@ export default function AdminClient({
     name: "",
     description: "",
     price: "",
-    category: "مکمل",
+    category: "supplement",
     stock: "",
-    image: "",
+    imageUrl: "",
   });
 
   const handleAdd = async () => {
-    if (!form.name || !form.price || !form.stock) {
-      alert("نام، قیمت و موجودی رو پر کن");
+    if (!form.name || !form.price) {
+      alert("نام و قیمت الزامی است");
       return;
     }
-
     setLoading(true);
-
-    const res = await fetch("/api/admin/products", {
+    const res = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        ...form,
+        name: form.name,
+        description: form.description,
         price: parseFloat(form.price),
-        stock: parseInt(form.stock),
+        category: form.category,
+        stock: parseInt(form.stock) || 0,
+        imageUrl: form.imageUrl || null,
       }),
     });
-
     if (res.ok) {
       setShowForm(false);
-      setForm({ name: "", description: "", price: "", category: "مکمل", stock: "", image: "" });
+      setForm({ name: "", description: "", price: "", category: "supplement", stock: "", imageUrl: "" });
       router.refresh();
+    } else {
+      alert("خطا در ذخیره محصول");
     }
-
     setLoading(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("مطمئنی؟")) return;
-
-    await fetch(`/api/admin/products/${id}`, { method: "DELETE" });
+    await fetch(`/api/products/${id}`, { method: "DELETE" });
     router.refresh();
   };
 
+  const categoryLabels: Record<string, string> = {
+    skincare: "مراقبت پوست",
+    supplement: "مکمل",
+    sport: "ورزشی",
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50" dir="rtl">
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-rose-500">پنل ادمین نوژین</h1>
-          <a href="/" className="text-sm text-gray-500 hover:text-rose-500">برگشت به سایت</a>
-        </div>
+    <main style={{ minHeight: "100vh", background: "#FAFAF8", fontFamily: "'Vazirmatn', sans-serif", direction: "rtl" }}>
+      <header style={{ background: "white", borderBottom: "1px solid rgba(26,58,42,0.12)", padding: "20px 48px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <h1 style={{ fontSize: 22, fontWeight: 900, color: "#1A3A2A" }}>پنل ادمین نوژین</h1>
+        <a href="/" style={{ fontSize: 13, color: "#5A5A56", textDecoration: "none" }}>برگشت به سایت</a>
       </header>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 48px" }}>
 
         {/* آمار */}
-        <div className="grid grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
-            <div className="text-3xl font-bold text-rose-500">{stats.users}</div>
-            <div className="text-gray-400 text-sm mt-1">کاربر</div>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
-            <div className="text-3xl font-bold text-rose-500">{stats.products}</div>
-            <div className="text-gray-400 text-sm mt-1">محصول</div>
-          </div>
-          <div className="bg-white rounded-2xl p-6 shadow-sm text-center">
-            <div className="text-3xl font-bold text-rose-500">{stats.routines}</div>
-            <div className="text-gray-400 text-sm mt-1">روتین ساخته شده</div>
-          </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+          {[
+            { label: "کاربر", value: stats.users },
+            { label: "محصول", value: stats.products },
+            { label: "روتین ساخته‌شده", value: stats.routines },
+          ].map((s) => (
+            <div key={s.label} style={{ background: "white", borderRadius: 16, padding: "24px", textAlign: "center", border: "1px solid rgba(26,58,42,0.12)" }}>
+              <div style={{ fontSize: 32, fontWeight: 900, color: "#1A3A2A" }}>{s.value}</div>
+              <div style={{ fontSize: 13, color: "#5A5A56", marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
         </div>
 
         {/* محصولات */}
-        <div className="bg-white rounded-2xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="font-bold text-gray-800 text-lg">محصولات</h2>
+        <div style={{ background: "white", borderRadius: 20, border: "1px solid rgba(26,58,42,0.12)", padding: "28px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#1A3A2A" }}>محصولات</h2>
             <button
               onClick={() => setShowForm(!showForm)}
-              className="bg-rose-500 text-white px-4 py-2 rounded-full text-sm hover:bg-rose-600"
+              style={{ background: "#1A3A2A", color: "white", border: "none", borderRadius: 50, padding: "10px 24px", fontSize: 13, fontWeight: 600, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer" }}
             >
               + محصول جدید
             </button>
           </div>
 
-          {/* فرم افزودن محصول */}
+          {/* فرم */}
           {showForm && (
-            <div className="bg-rose-50 rounded-2xl p-6 mb-6">
-              <h3 className="font-bold text-gray-700 mb-4">افزودن محصول جدید</h3>
-              <div className="grid grid-cols-2 gap-4">
+            <div style={{ background: "#D8F3DC", borderRadius: 16, padding: 24, marginBottom: 24 }}>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1A3A2A", marginBottom: 16 }}>افزودن محصول جدید</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">نام محصول</label>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>نام محصول</label>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">دسته‌بندی</label>
-                  <select
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
-                  >
-                    <option value="مکمل">مکمل</option>
-                    <option value="پوستی">پوستی</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm text-gray-600 mb-1 block">قیمت (تومان)</label>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>قیمت (تومان)</label>
                   <input
                     type="number"
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
                   />
                 </div>
                 <div>
-                  <label className="text-sm text-gray-600 mb-1 block">موجودی</label>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>دسته‌بندی</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
+                  >
+                    <option value="supplement">مکمل</option>
+                    <option value="skincare">مراقبت پوست</option>
+                    <option value="sport">ورزشی</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>موجودی</label>
                   <input
                     type="number"
                     value={form.stock}
                     onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="text-sm text-gray-600 mb-1 block">توضیحات</label>
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>توضیحات</label>
                   <input
                     type="text"
                     value={form.description}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
                   />
                 </div>
-                <div className="col-span-2">
-                  <label className="text-sm text-gray-600 mb-1 block">لینک تصویر</label>
+                <div style={{ gridColumn: "span 2" }}>
+                  <label style={{ fontSize: 12, color: "#2D6A4F", display: "block", marginBottom: 6 }}>لینک تصویر (اختیاری)</label>
                   <input
                     type="text"
-                    value={form.image}
-                    onChange={(e) => setForm({ ...form, image: e.target.value })}
-                    className="w-full border-2 border-rose-100 rounded-xl px-4 py-2 focus:outline-none focus:border-rose-400"
+                    value={form.imageUrl}
+                    onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
                     placeholder="https://..."
+                    style={{ width: "100%", border: "1px solid rgba(26,58,42,0.2)", borderRadius: 10, padding: "10px 14px", fontSize: 14, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}
                   />
                 </div>
               </div>
-              <div className="flex gap-3 mt-4">
+              <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
                 <button
                   onClick={handleAdd}
                   disabled={loading}
-                  className="bg-rose-500 text-white px-6 py-2 rounded-full hover:bg-rose-600 disabled:opacity-50"
+                  style={{ background: "#1A3A2A", color: "white", border: "none", borderRadius: 50, padding: "10px 28px", fontSize: 13, fontWeight: 700, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer", opacity: loading ? 0.6 : 1 }}
                 >
                   {loading ? "در حال ذخیره..." : "ذخیره"}
                 </button>
                 <button
                   onClick={() => setShowForm(false)}
-                  className="bg-gray-200 text-gray-600 px-6 py-2 rounded-full hover:bg-gray-300"
+                  style={{ background: "rgba(26,58,42,0.1)", color: "#1A3A2A", border: "none", borderRadius: 50, padding: "10px 28px", fontSize: 13, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer" }}
                 >
                   انصراف
                 </button>
@@ -191,38 +194,40 @@ export default function AdminClient({
             </div>
           )}
 
-          {/* لیست محصولات */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-gray-400 border-b">
-                  <th className="text-right py-3">نام</th>
-                  <th className="text-right py-3">دسته</th>
-                  <th className="text-right py-3">قیمت</th>
-                  <th className="text-right py-3">موجودی</th>
-                  <th className="text-right py-3">عملیات</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((product) => (
-                  <tr key={product.id} className="border-b hover:bg-rose-50">
-                    <td className="py-3 font-medium text-gray-800">{product.name}</td>
-                    <td className="py-3 text-gray-500">{product.category}</td>
-                    <td className="py-3 text-gray-500">{product.price.toLocaleString("fa-IR")}</td>
-                    <td className="py-3 text-gray-500">{product.stock}</td>
-                    <td className="py-3">
-                      <button
-                        onClick={() => handleDelete(product.id)}
-                        className="text-red-400 hover:text-red-600 text-xs"
-                      >
-                        حذف
-                      </button>
-                    </td>
-                  </tr>
+          {/* جدول */}
+          <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ borderBottom: "2px solid rgba(26,58,42,0.1)" }}>
+                {["نام", "دسته", "قیمت", "موجودی", "عملیات"].map((h) => (
+                  <th key={h} style={{ textAlign: "right", padding: "10px 8px", color: "#5A5A56", fontWeight: 600 }}>{h}</th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((product) => (
+                <tr key={product.id} style={{ borderBottom: "1px solid rgba(26,58,42,0.08)" }}>
+                  <td style={{ padding: "12px 8px", fontWeight: 600, color: "#1C1C1A" }}>{product.name}</td>
+                  <td style={{ padding: "12px 8px", color: "#5A5A56" }}>{categoryLabels[product.category] ?? product.category}</td>
+                  <td style={{ padding: "12px 8px", color: "#2D6A4F", fontWeight: 700 }}>{product.price.toLocaleString("fa-IR")}</td>
+                  <td style={{ padding: "12px 8px", color: "#5A5A56" }}>{product.stock}</td>
+                  <td style={{ padding: "12px 8px" }}>
+                    <button
+                      onClick={() => handleDelete(product.id)}
+                      style={{ color: "#c0392b", background: "none", border: "none", fontSize: 12, cursor: "pointer", fontFamily: "'Vazirmatn', sans-serif" }}
+                    >
+                      حذف
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {products.length === 0 && (
+            <div style={{ textAlign: "center", padding: "48px 0", color: "#5A5A56", fontSize: 14 }}>
+              هنوز محصولی اضافه نشده
+            </div>
+          )}
         </div>
       </div>
     </main>
