@@ -16,7 +16,7 @@ const s = {
 }
 
 type Product = {
-  id: number
+  id: string
   name: string
   price: number
   category: string
@@ -35,7 +35,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
-  const [added, setAdded] = useState<number | null>(null)
+  const [added, setAdded] = useState<string | null>(null)
   const addToCart = useCartStore((state) => state.addItem)
 
   useEffect(() => {
@@ -52,7 +52,7 @@ export default function ProductsPage() {
     : products.filter((p) => p.category === activeCategory)
 
   function handleAdd(product: Product) {
-    addToCart({ id: product.id, name: product.name, price: product.price, quantity: 1 })
+    addToCart({ id: String(product.id), name: product.name, price: product.price, quantity: 1 })
     setAdded(product.id)
     setTimeout(() => setAdded(null), 1500)
   }
