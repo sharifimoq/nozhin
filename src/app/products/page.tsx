@@ -52,10 +52,10 @@ export default function ProductsPage() {
     : products.filter((p) => p.category === activeCategory)
 
   function handleAdd(product: Product) {
-    addToCart({ id: String(product.id), name: product.name, price: product.price, quantity: 1 })
-    setAdded(product.id)
-    setTimeout(() => setAdded(null), 1500)
-  }
+  addToCart({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? null, quantity: 1 })
+  setAdded(product.id)
+  setTimeout(() => setAdded(null), 1500)
+}
 
   const categoryIcon: Record<string, string> = {
     skincare: '🧴', supplement: '💊', sport: '💪',

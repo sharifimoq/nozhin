@@ -39,7 +39,7 @@ export default function Cart() {
               {items.map((item) => (
                 <div key={item.id} className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm">
                   <img
-                    src={item.image || "https://placehold.co/80x80?text=Product"}
+                    src={item.imageUrl || "https://placehold.co/80x80?text=Product"}
                     alt={item.name}
                     className="w-20 h-20 object-contain bg-rose-50 rounded-xl p-2"
                   />
