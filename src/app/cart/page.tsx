@@ -2,108 +2,194 @@
 import { useCartStore } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
 
+const s = {
+  cream: '#FAFAF8',
+  greenDark: '#1A3A2A',
+  greenMid: '#2D6A4F',
+  greenLight: '#52B788',
+  greenPale: '#D8F3DC',
+  text: '#1C1C1A',
+  textMuted: '#5A5A56',
+  border: 'rgba(26, 58, 42, 0.12)',
+}
+
 export default function Cart() {
   const { items, removeItem, increaseQuantity, decreaseQuantity, totalPrice, clearCart } = useCartStore();
   const router = useRouter();
 
   return (
-    <main className="min-h-screen bg-rose-50" dir="rtl">
-      {/* هدر */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <a href="/" className="text-2xl font-bold text-rose-500">نوژین</a>
-          <h1 className="text-lg font-bold text-gray-700">سبد خرید</h1>
-          <a href="/products" className="text-sm text-gray-500 hover:text-rose-500">ادامه خرید</a>
-        </div>
-      </header>
+    <main style={{ minHeight: '100vh', background: s.cream, fontFamily: "'Vazirmatn', sans-serif", direction: 'rtl' }}>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      {/* Navbar */}
+      <nav style={{
+        background: 'white', borderBottom: `1px solid ${s.border}`,
+        padding: '20px 48px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <a href="/" style={{ fontSize: 26, fontWeight: 900, color: s.greenDark, textDecoration: 'none' }}>
+          نوژ<span style={{ color: s.greenLight }}>ین</span>
+        </a>
+        <h1 style={{ fontSize: 16, fontWeight: 700, color: s.text }}>سبد خرید</h1>
+        <a href="/products" style={{ fontSize: 13, color: s.textMuted, textDecoration: 'none' }}>
+          ادامه خرید ←
+        </a>
+      </nav>
+
+      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px' }}>
+
         {items.length === 0 ? (
-          /* سبد خالیه */
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">🛒</div>
-            <h2 className="text-xl font-bold text-gray-700 mb-2">سبد خریدت خالیه!</h2>
-            <p className="text-gray-400 mb-6">برو محصولات رو ببین و اضافه کن</p>
+          /* سبد خالی */
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <div style={{ fontSize: 64, marginBottom: 20 }}>🛒</div>
+            <h2 style={{ fontSize: 22, fontWeight: 900, color: s.greenDark, marginBottom: 8 }}>
+              سبد خریدت خالیه!
+            </h2>
+            <p style={{ fontSize: 14, color: s.textMuted, marginBottom: 32 }}>
+              برو محصولات رو ببین و اضافه کن
+            </p>
             <button
-              onClick={() => router.push("/products")}
-              className="bg-rose-500 text-white px-6 py-3 rounded-full hover:bg-rose-600"
+              onClick={() => router.push('/products')}
+              style={{
+                background: s.greenDark, color: 'white', border: 'none',
+                padding: '14px 36px', borderRadius: 50, fontSize: 14,
+                fontWeight: 700, fontFamily: "'Vazirmatn', sans-serif", cursor: 'pointer',
+              }}
             >
               رفتن به محصولات
             </button>
           </div>
+
         ) : (
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
 
             {/* لیست محصولات */}
-            <div className="flex-1 flex flex-col gap-4">
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
               {items.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm">
-                  <img
-                    src={item.imageUrl || "https://placehold.co/80x80?text=Product"}
-                    alt={item.name}
-                    className="w-20 h-20 object-contain bg-rose-50 rounded-xl p-2"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-800">{item.name}</h3>
-                    <p className="text-rose-500 font-bold mt-1">
-                      {item.price.toLocaleString("fa-IR")} تومان
-                    </p>
+                <div key={item.id} style={{
+                  background: 'white', borderRadius: 16,
+                  border: `1px solid ${s.border}`, padding: '16px 20px',
+                  display: 'flex', alignItems: 'center', gap: 16,
+                }}>
+                  {/* تصویر */}
+                  <div style={{
+                    width: 72, height: 72, background: s.greenPale,
+                    borderRadius: 12, display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', flexShrink: 0, overflow: 'hidden',
+                  }}>
+                    {item.imageUrl ? (
+                      <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      <span style={{ fontSize: 28 }}>📦</span>
+                    )}
+                  </div>
+
+                  {/* اطلاعات */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: s.text, marginBottom: 4 }}>
+                      {item.name}
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: s.greenMid }}>
+                      {item.price.toLocaleString('fa-IR')} تومان
+                    </div>
                   </div>
 
                   {/* کنترل تعداد */}
-                  <div className="flex items-center gap-2">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                     <button
                       onClick={() => decreaseQuantity(item.id)}
-                      className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 font-bold hover:bg-rose-200"
-                    >
-                      −
-                    </button>
-                    <span className="w-6 text-center font-bold">{item.quantity}</span>
+                      style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        border: `1px solid ${s.border}`, background: 'white',
+                        fontSize: 18, cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        color: s.greenDark, fontFamily: "'Vazirmatn', sans-serif",
+                      }}
+                    >−</button>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: s.text, minWidth: 20, textAlign: 'center' }}>
+                      {item.quantity}
+                    </span>
                     <button
                       onClick={() => increaseQuantity(item.id)}
-                      className="w-8 h-8 rounded-full bg-rose-100 text-rose-500 font-bold hover:bg-rose-200"
-                    >
-                      +
-                    </button>
+                      style={{
+                        width: 32, height: 32, borderRadius: '50%',
+                        border: 'none', background: s.greenDark,
+                        fontSize: 18, cursor: 'pointer', display: 'flex',
+                        alignItems: 'center', justifyContent: 'center',
+                        color: 'white', fontFamily: "'Vazirmatn', sans-serif",
+                      }}
+                    >+</button>
+                  </div>
+
+                  {/* جمع این آیتم */}
+                  <div style={{ fontSize: 14, fontWeight: 700, color: s.text, minWidth: 100, textAlign: 'left' }}>
+                    {(item.price * item.quantity).toLocaleString('fa-IR')}
                   </div>
 
                   {/* حذف */}
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="text-gray-300 hover:text-red-400 text-xl"
-                  >
-                    ✕
-                  </button>
+                    style={{
+                      background: 'none', border: 'none', color: s.textMuted,
+                      fontSize: 18, cursor: 'pointer', padding: 4,
+                    }}
+                  >✕</button>
                 </div>
               ))}
 
-              {/* خالی کردن سبد */}
               <button
                 onClick={clearCart}
-                className="text-sm text-gray-400 hover:text-red-400 text-right"
+                style={{
+                  background: 'none', border: 'none', color: s.textMuted,
+                  fontSize: 12, cursor: 'pointer', textAlign: 'right',
+                  fontFamily: "'Vazirmatn', sans-serif", padding: '4px 0',
+                }}
               >
                 حذف همه
               </button>
             </div>
 
             {/* خلاصه سفارش */}
-            <div className="lg:w-72">
-              <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
-                <h2 className="font-bold text-gray-800 mb-4">خلاصه سفارش</h2>
-                <div className="flex justify-between text-gray-500 mb-2">
-                  <span>تعداد محصولات</span>
-                  <span>{items.reduce((s, i) => s + i.quantity, 0)} عدد</span>
+            <div style={{ width: 280, flexShrink: 0 }}>
+              <div style={{
+                background: 'white', borderRadius: 20,
+                border: `1px solid ${s.border}`, padding: 24,
+                position: 'sticky', top: 24,
+              }}>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 20 }}>
+                  خلاصه سفارش
+                </h2>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12, fontSize: 13, color: s.textMuted }}>
+                  <span>{items.reduce((sum, i) => sum + i.quantity, 0)} عدد محصول</span>
+                  <span>تعداد</span>
                 </div>
-                <div className="flex justify-between font-bold text-gray-800 text-lg border-t pt-4 mt-4">
+
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  borderTop: `1px solid ${s.border}`, paddingTop: 16, marginTop: 8,
+                  fontSize: 16, fontWeight: 900, color: s.greenDark,
+                }}>
+                  <span>{totalPrice().toLocaleString('fa-IR')} تومان</span>
                   <span>مبلغ کل</span>
-                  <span>{totalPrice().toLocaleString("fa-IR")} تومان</span>
                 </div>
+
                 <button
-                  onClick={() => router.push("/checkout")}
-                  className="w-full bg-rose-500 text-white py-3 rounded-full mt-6 hover:bg-rose-600 font-bold"
+                  onClick={() => router.push('/checkout')}
+                  style={{
+                    width: '100%', background: s.greenDark, color: 'white',
+                    border: 'none', borderRadius: 50, padding: '14px',
+                    fontSize: 14, fontWeight: 700, marginTop: 20,
+                    fontFamily: "'Vazirmatn', sans-serif", cursor: 'pointer',
+                  }}
                 >
                   ادامه و پرداخت
                 </button>
+
+                <a href="/products" style={{
+                  display: 'block', textAlign: 'center', marginTop: 12,
+                  fontSize: 13, color: s.textMuted, textDecoration: 'none',
+                }}>
+                  ← ادامه خرید
+                </a>
               </div>
             </div>
 
