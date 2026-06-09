@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { s, font } from '@/lib/styles';
 
 type Routine = {
   id: string;
@@ -23,55 +24,100 @@ export default async function Profile() {
   const routines: Routine[] = (user as any)?.routines ?? [];
 
   return (
-    <main className="min-h-screen" style={{ background: "var(--cream)" }} dir="rtl">
-      <header style={{ background: "var(--cream)", borderBottom: "0.5px solid #E8E4DC" }} className="sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div style={{ background: "var(--sage)", borderRadius: "10px", width: "32px", height: "32px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <span style={{ color: "white", fontFamily: "var(--font-playfair)", fontSize: "16px" }}>ن</span>
-            </div>
-            <a href="/" style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", textDecoration: "none" }}>نوژین</a>
-          </div>
-          <nav className="flex gap-8 text-sm" style={{ color: "var(--mid)" }}>
-            <a href="/products" className="hover:text-black transition-colors">محصولات</a>
-            <a href="/quiz" className="hover:text-black transition-colors">روتین من</a>
-          </nav>
-          <span style={{ fontSize: "14px", color: "var(--mid)" }}>{user?.name}</span>
-        </div>
-      </header>
+    <main style={{ minHeight: "100vh", background: s.cream, fontFamily: font, direction: "rtl" }}>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px", marginBottom: "32px", display: "flex", alignItems: "center", gap: "16px" }}>
-          <div style={{ width: "56px", height: "56px", background: "var(--sage-light)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "24px" }}>
+      {/* Navbar */}
+      <nav style={{
+        background: "white", borderBottom: `1px solid ${s.border}`,
+        padding: "20px 48px", display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <a href="/" style={{ fontSize: 26, fontWeight: 900, color: s.greenDark, textDecoration: "none" }}>
+          نوژ<span style={{ color: s.greenLight }}>ین</span>
+        </a>
+        <div style={{ display: "flex", gap: 32 }}>
+          <a href="/products" style={{ fontSize: 14, color: s.textMuted, textDecoration: "none" }}>محصولات</a>
+          <a href="/quiz" style={{ fontSize: 14, color: s.textMuted, textDecoration: "none" }}>روتین من</a>
+        </div>
+        <span style={{ fontSize: 14, color: s.textMuted }}>{user?.name}</span>
+      </nav>
+
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px" }}>
+
+        {/* کارت پروفایل */}
+        <div style={{
+          background: "white", borderRadius: 20, border: `1px solid ${s.border}`,
+          padding: "24px 28px", marginBottom: 32,
+          display: "flex", alignItems: "center", gap: 20,
+        }}>
+          <div style={{
+            width: 56, height: 56, background: s.greenPale, borderRadius: "50%",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 22, flexShrink: 0,
+          }}>
             👤
           </div>
           <div style={{ flex: 1 }}>
-            <h2 style={{ fontFamily: "var(--font-playfair)", fontSize: "20px", color: "var(--dark)", marginBottom: "4px" }}>{user?.name}</h2>
-            <p style={{ fontSize: "13px", color: "var(--light)" }}>{user?.email}</p>
+            <div style={{ fontSize: 18, fontWeight: 900, color: s.greenDark, marginBottom: 4 }}>
+              {user?.name}
+            </div>
+            <div style={{ fontSize: 13, color: s.textMuted }}>{user?.email}</div>
           </div>
-          <a href="/quiz" style={{ background: "var(--sage)", color: "white", padding: "10px 20px", borderRadius: "100px", fontSize: "13px", textDecoration: "none" }}>
+          <a href="/quiz" style={{
+            background: s.greenDark, color: "white", padding: "10px 24px",
+            borderRadius: 50, fontSize: 13, fontWeight: 600, textDecoration: "none",
+          }}>
             روتین جدید
           </a>
         </div>
 
-        <h3 style={{ fontFamily: "var(--font-playfair)", fontSize: "22px", color: "var(--dark)", marginBottom: "20px" }}>روتین‌های قبلی</h3>
+        {/* روتین‌های قبلی */}
+        <div style={{ fontSize: 20, fontWeight: 900, color: s.greenDark, marginBottom: 20 }}>
+          روتین‌های قبلی
+        </div>
 
         {routines.length === 0 ? (
-          <div style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "48px", textAlign: "center" }}>
-            <div style={{ fontSize: "40px", marginBottom: "12px" }}>🌿</div>
-            <p style={{ color: "var(--light)", fontSize: "14px", marginBottom: "20px" }}>هنوز روتینی نداری — برو پرسشنامه رو پر کن!</p>
-            <a href="/quiz" style={{ background: "var(--sage)", color: "white", padding: "10px 24px", borderRadius: "100px", fontSize: "13px", textDecoration: "none" }}>
+          <div style={{
+            background: "white", borderRadius: 20, border: `1px solid ${s.border}`,
+            padding: "56px", textAlign: "center",
+          }}>
+            <div style={{ fontSize: 44, marginBottom: 16 }}>🌿</div>
+            <p style={{ color: s.textMuted, fontSize: 14, marginBottom: 24 }}>
+              هنوز روتینی نداری — برو پرسشنامه رو پر کن!
+            </p>
+            <a href="/quiz" style={{
+              background: s.greenDark, color: "white", padding: "12px 28px",
+              borderRadius: 50, fontSize: 13, fontWeight: 600, textDecoration: "none",
+            }}>
               شروع کن
             </a>
           </div>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            {routines.map((routine) => (
-              <div key={routine.id} style={{ background: "white", borderRadius: "20px", border: "0.5px solid #E8E4DC", padding: "24px" }}>
-                <div style={{ fontSize: "12px", color: "var(--light)", marginBottom: "16px", letterSpacing: "0.04em" }}>
-                  {new Date(routine.createdAt).toLocaleDateString("fa-IR")}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {routines.map((routine, index) => (
+              <div key={routine.id} style={{
+                background: "white", borderRadius: 20,
+                border: `1px solid ${s.border}`, padding: "24px 28px",
+              }}>
+                <div style={{
+                  display: "flex", justifyContent: "space-between",
+                  alignItems: "center", marginBottom: 16,
+                }}>
+                  <div style={{
+                    background: s.greenPale, color: s.greenMid,
+                    fontSize: 11, fontWeight: 700, padding: "4px 12px",
+                    borderRadius: 50, letterSpacing: 1,
+                  }}>
+                    روتین {index + 1}
+                  </div>
+                  <div style={{ fontSize: 12, color: s.textMuted }}>
+                    {new Date(routine.createdAt).toLocaleDateString("fa-IR")}
+                  </div>
                 </div>
-                <div style={{ fontSize: "14px", color: "var(--mid)", lineHeight: "2", whiteSpace: "pre-line" }}>
+                <div style={{
+                  fontSize: 14, color: s.textMuted, lineHeight: 2,
+                  whiteSpace: "pre-line", background: s.cream,
+                  borderRadius: 12, padding: "16px 20px",
+                }}>
                   {routine.result}
                 </div>
               </div>
