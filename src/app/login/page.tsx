@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { s, btn, input, card, font } from '@/lib/styles';
+import { s, btn, input, card, font } from '@/lib/style';
 
 export default function Login() {
   const router = useRouter();

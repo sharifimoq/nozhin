@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  // چک می‌کنیم کاربر لاگین کرده یا نه
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   // اگه لاگین نکرده، روتین رو ذخیره نمی‌کنیم — ایرادی نداره
   if (!session?.user?.email) {

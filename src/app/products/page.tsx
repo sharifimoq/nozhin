@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
+import NavbarActions from '@/components/NavbarActions'
 
 const s = {
   cream: '#FAFAF8',
@@ -81,12 +82,7 @@ export default function ProductsPage() {
           <Link href="/quiz" style={{ fontSize: 14, color: s.textMuted, textDecoration: 'none' }}>روتین من</Link>
           <Link href="/about" style={{ fontSize: 14, color: s.textMuted, textDecoration: 'none' }}>درباره ما</Link>
         </div>
-        <Link href="/quiz" style={{
-          background: s.greenDark, color: 'white', fontSize: 14, fontWeight: 600,
-          padding: '10px 24px', borderRadius: 50, textDecoration: 'none',
-        }}>
-          شروع روتین
-        </Link>
+        <NavbarActions />
       </nav>
 
       {/* Header */}

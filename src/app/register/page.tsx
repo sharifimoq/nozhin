@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { s, btn, input, card, font } from '@/lib/styles';
+import { s, btn, input, card, font } from '@/lib/style';
 
 export default function Register() {
   const router = useRouter();

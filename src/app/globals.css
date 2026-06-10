@@ -32,3 +32,43 @@ body {
   direction: rtl;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .hero-card {
+    display: none !important;
+  }
+  .nav-links {
+    display: none !important;
+  }
+  .nav-padding {
+    padding: 16px 20px !important;
+  }
+  .cart-layout {
+    flex-direction: column !important;
+  }
+  .cart-sidebar {
+    width: 100% !important;
+  }
+  .checkout-layout {
+    flex-direction: column !important;
+  }
+  .checkout-sidebar {
+    width: 100% !important;
+  }
+  .page-padding {
+    padding: 24px 16px !important;
+  }
+  .about-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .admin-stats {
+    grid-template-columns: 1fr !important;
+  }
+  h1.hero-title {
+    font-size: 36px !important;
+  }
+}

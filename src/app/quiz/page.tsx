@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useCartStore } from "@/store/cartStore";
 
 const s = {
   cream: '#FAFAF8',
@@ -66,12 +67,30 @@ const pathLabels: Record<Path, string> = {
   sport: 'روتین ورزشی',
 }
 
+const pathToCategory: Record<Path, string> = {
+  skin: 'skincare',
+  health: 'supplement',
+  sport: 'sport',
+}
+
+type Product = {
+  id: string
+  name: string
+  price: number
+  category: string
+  description: string
+  imageUrl?: string
+}
+
 export default function Quiz() {
   const [selectedPath, setSelectedPath] = useState<Path | null>(null)
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
+  const [products, setProducts] = useState<Product[]>([])
+  const [addedId, setAddedId] = useState<string | null>(null)
+  const addToCart = useCartStore((s) => s.addItem)
 
   const currentQuestions = selectedPath ? questions[selectedPath] : []
 
@@ -83,18 +102,23 @@ export default function Quiz() {
       setCurrent(current + 1)
     } else {
       setLoading(true)
-      const response = await fetch('/api/routine', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          answers: newAnswers,
-          questions: currentQuestions.map((q) => q.question),
-          path: selectedPath,
+      const [routineRes, productsRes] = await Promise.all([
+        fetch('/api/routine', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            answers: newAnswers,
+            questions: currentQuestions.map((q) => q.question),
+            path: selectedPath,
+          }),
         }),
-      })
-      const data = await response.json()
+        fetch(`/api/products?category=${pathToCategory[selectedPath!]}`),
+      ])
+      const data = await routineRes.json()
+      const allProducts: Product[] = await productsRes.json()
       setResult(data.routine)
-      await fetch('/api/routine/save', {
+      setProducts(allProducts.slice(0, 4))
+      fetch('/api/routine/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ answers: newAnswers, result: data.routine }),
@@ -103,11 +127,18 @@ export default function Quiz() {
     }
   }
 
+  function handleAddToCart(p: Product) {
+    addToCart({ id: p.id, name: p.name, price: p.price, imageUrl: p.imageUrl ?? null, quantity: 1 })
+    setAddedId(p.id)
+    setTimeout(() => setAddedId(null), 1500)
+  }
+
   const reset = () => {
     setSelectedPath(null)
     setCurrent(0)
     setAnswers([])
     setResult('')
+    setProducts([])
   }
 
   return (
@@ -147,13 +178,72 @@ export default function Quiz() {
                   {pathLabels[selectedPath!]}
                 </h2>
               </div>
+
+              {/* متن روتین */}
               <div style={{
                 fontSize: 14, color: s.textMuted, lineHeight: 2,
                 whiteSpace: 'pre-line', background: s.cream,
-                borderRadius: 16, padding: 24, marginBottom: 24,
+                borderRadius: 16, padding: 24, marginBottom: 28,
               }}>
                 {result}
               </div>
+
+              {/* محصولات پیشنهادی */}
+              {products.length > 0 && (
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{
+                    fontSize: 13, fontWeight: 700, color: s.greenDark,
+                    marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8,
+                  }}>
+                    <span style={{
+                      width: 20, height: 20, background: s.greenPale, borderRadius: '50%',
+                      display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10,
+                    }}>✦</span>
+                    محصولات پیشنهادی برای روتین شما
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    {products.map((p) => (
+                      <div key={p.id} style={{
+                        display: 'flex', alignItems: 'center', gap: 12,
+                        background: s.cream, borderRadius: 14,
+                        border: `1px solid ${s.border}`, padding: '12px 14px',
+                      }}>
+                        <div style={{
+                          width: 48, height: 48, background: s.greenPale, borderRadius: 10,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          flexShrink: 0, overflow: 'hidden',
+                        }}>
+                          {p.imageUrl
+                            ? <img src={p.imageUrl} alt={p.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            : <span style={{ fontSize: 20 }}>{selectedPath === 'skin' ? '🧴' : selectedPath === 'sport' ? '💪' : '💊'}</span>
+                          }
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: s.text, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {p.name}
+                          </div>
+                          <div style={{ fontSize: 12, color: s.greenMid, fontWeight: 700 }}>
+                            {p.price.toLocaleString('fa-IR')} تومان
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleAddToCart(p)}
+                          style={{
+                            background: addedId === p.id ? s.greenLight : s.greenDark,
+                            color: 'white', border: 'none', borderRadius: 10,
+                            padding: '8px 14px', fontSize: 12, fontWeight: 700,
+                            fontFamily: "'Vazirmatn', sans-serif", cursor: 'pointer',
+                            flexShrink: 0, transition: 'background 0.2s',
+                          }}
+                        >
+                          {addedId === p.id ? '✓' : '+ سبد'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div style={{ display: 'flex', gap: 12 }}>
                 <button onClick={reset} style={{
                   flex: 1, background: 'transparent', color: s.greenMid,
@@ -162,13 +252,13 @@ export default function Quiz() {
                 }}>
                   دوباره امتحان کن
                 </button>
-                <a href="/products" style={{
+                <a href="/cart" style={{
                   flex: 1, background: s.greenDark, color: 'white',
                   padding: '12px', borderRadius: 50, fontSize: 13, fontWeight: 600,
                   textAlign: 'center', textDecoration: 'none',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  مشاهده محصولات
+                  مشاهده سبد خرید
                 </a>
               </div>
             </div>

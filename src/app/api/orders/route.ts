@@ -1,7 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-// ذخیره سفارش جدید توی دیتابیس
+export async function GET() {
+  const orders = await prisma.order.findMany({
+    include: { items: true },
+    orderBy: { createdAt: "desc" },
+  });
+  return NextResponse.json(orders);
+}
+
 export async function POST(req: Request) {
   const { name, email, mobile, address, total, items, refId } = await req.json();
 

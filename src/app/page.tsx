@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import NavbarActions from '@/components/NavbarActions'
 
 export default function HomePage() {
   const styles = {
@@ -24,21 +25,16 @@ export default function HomePage() {
         <span style={{ fontSize: 26, fontWeight: 900, color: styles.greenDark, letterSpacing: -1 }}>
           نوژ<span style={{ color: styles.greenLight }}>ین</span>
         </span>
-        <div style={{ display: 'flex', gap: 32 }}>
+        <div className="nav-links" style={{ display: 'flex', gap: 32 }}>
           <Link href="/products" style={{ fontSize: 14, color: styles.textMuted, textDecoration: 'none' }}>محصولات</Link>
           <Link href="/quiz" style={{ fontSize: 14, color: styles.textMuted, textDecoration: 'none' }}>روتین من</Link>
           <Link href="/about" style={{ fontSize: 14, color: styles.textMuted, textDecoration: 'none' }}>درباره ما</Link>
         </div>
-        <Link href="/quiz" style={{
-          background: styles.greenDark, color: 'white', fontSize: 14, fontWeight: 600,
-          padding: '10px 24px', borderRadius: 50, textDecoration: 'none',
-        }}>
-          شروع روتین
-        </Link>
+        <NavbarActions />
       </nav>
 
       {/* Hero */}
-      <section style={{
+      <section className="hero-grid" style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40,
         padding: '60px 48px', alignItems: 'center',
       }}>
@@ -80,7 +76,7 @@ export default function HomePage() {
         </div>
 
         {/* Card */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div className="hero-card" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <div style={{ position: 'relative', width: 300 }}>
             <div style={{
               position: 'absolute', top: -20, right: 20, left: -20, bottom: 0,

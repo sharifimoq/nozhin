@@ -15,7 +15,7 @@ export async function POST(req: Request) {
       description,
       email,
       mobile,
-      callback_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/verify`,
+      callback_url: `${process.env.NEXT_PUBLIC_BASE_URL}/api/payment/verify?amount=${amount}`,
     });
 
     const { code, authority } = response.data.data;

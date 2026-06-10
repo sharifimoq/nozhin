@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { s, font } from '@/lib/styles';
+import { s, font } from '@/lib/style';
 
 type Routine = {
   id: string;
@@ -10,7 +11,7 @@ type Routine = {
 };
 
 export default async function Profile() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.email) {
     redirect("/login");
@@ -37,6 +38,7 @@ export default async function Profile() {
         <div style={{ display: "flex", gap: 32 }}>
           <a href="/products" style={{ fontSize: 14, color: s.textMuted, textDecoration: "none" }}>محصولات</a>
           <a href="/quiz" style={{ fontSize: 14, color: s.textMuted, textDecoration: "none" }}>روتین من</a>
+          <a href="/orders" style={{ fontSize: 14, color: s.textMuted, textDecoration: "none" }}>سفارش‌ها</a>
         </div>
         <span style={{ fontSize: 14, color: s.textMuted }}>{user?.name}</span>
       </nav>

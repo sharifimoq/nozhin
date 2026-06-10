@@ -2,7 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter, useSearchParams } from "next/navigation";
-import { s, btn, input, card, font } from '@/lib/styles';
+import { s, btn, input, card, font } from '@/lib/style';
 
 function CheckoutContent() {
   const { items, totalPrice, clearCart } = useCartStore();
@@ -108,7 +108,7 @@ function CheckoutContent() {
       </nav>
 
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px" }}>
-        <div style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
+        <div className="checkout-layout" style={{ display: "flex", gap: 24, alignItems: "flex-start" }}>
 
           {/* فرم اطلاعات */}
           <div style={{ flex: 1, ...card, padding: "28px" }}>
@@ -148,7 +148,7 @@ function CheckoutContent() {
           </div>
 
           {/* خلاصه سفارش */}
-          <div style={{ width: 280, flexShrink: 0 }}>
+          <div className="checkout-sidebar" style={{ width: 280, flexShrink: 0 }}>
             <div style={{ ...card, padding: "24px", position: "sticky", top: 24 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 20 }}>
                 خلاصه سفارش

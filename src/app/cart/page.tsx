@@ -59,7 +59,7 @@ export default function Cart() {
           </div>
 
         ) : (
-          <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+          <div className="cart-layout" style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
 
             {/* لیست محصولات */}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -148,7 +148,7 @@ export default function Cart() {
             </div>
 
             {/* خلاصه سفارش */}
-            <div style={{ width: 280, flexShrink: 0 }}>
+            <div className="cart-sidebar" style={{ width: 280, flexShrink: 0 }}>
               <div style={{
                 background: 'white', borderRadius: 20,
                 border: `1px solid ${s.border}`, padding: 24,
