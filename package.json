@@ -7,7 +7,9 @@
     "build": "prisma migrate deploy && next build",
     "postinstall": "prisma generate",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "bot": "tsx bot-start.ts",
+    "bot:webhook": "tsx bot-set-webhook.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -25,6 +27,7 @@
     "prisma": "^7.8.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "telegraf": "^4.16.3",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
