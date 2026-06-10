@@ -29,6 +29,9 @@ const categoryLabels: Record<string, string> = {
   skincare: 'مراقبت پوست',
   supplement: 'مکمل',
   sport: 'ورزشی',
+  پوستی: 'مراقبت پوست',
+  مکمل: 'مکمل',
+  ورزشی: 'ورزشی',
 }
 
 export default function ProductsPage() {
@@ -59,6 +62,7 @@ export default function ProductsPage() {
 
   const categoryIcon: Record<string, string> = {
     skincare: '🧴', supplement: '💊', sport: '💪',
+    پوستی: '🧴', مکمل: '💊', ورزشی: '💪',
   }
 
   return (

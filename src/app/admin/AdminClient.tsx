@@ -75,6 +75,9 @@ export default function AdminClient({
     skincare: "مراقبت پوست",
     supplement: "مکمل",
     sport: "ورزشی",
+    پوستی: "مراقبت پوست",
+    مکمل: "مکمل",
+    ورزشی: "ورزشی",
   };
 
   return (
