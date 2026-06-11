@@ -6,6 +6,9 @@ import { PrismaPg } from "@prisma/adapter-pg";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
+const u = (id: string) =>
+  `https://images.unsplash.com/photo-${id}?w=500&h=500&fit=crop&auto=format&q=80`;
+
 async function main() {
   await prisma.product.deleteMany();
 
@@ -18,7 +21,7 @@ async function main() {
         price: 185000,
         category: "supplement",
         stock: 60,
-        imageUrl: "https://images.iherb.com/l/NMD-00173-9.jpg",
+        imageUrl: u("ffcmO0GLM14"),
       },
       {
         name: "امگا ۳ ۱۲۰۰ میلی‌گرم NOW Foods",
@@ -26,7 +29,7 @@ async function main() {
         price: 245000,
         category: "supplement",
         stock: 45,
-        imageUrl: "https://images.iherb.com/l/NOW-01700-9.jpg",
+        imageUrl: u("iX4Dj_imAt4"),
       },
       {
         name: "ویتامین D3 + K2 2000 IU NOW Foods",
@@ -34,7 +37,7 @@ async function main() {
         price: 210000,
         category: "supplement",
         stock: 50,
-        imageUrl: "https://images.iherb.com/l/NOW-00369-9.jpg",
+        imageUrl: u("Lx9NITOZJTE"),
       },
       {
         name: "زینک ۵۰ میلی‌گرم NOW Foods",
@@ -42,7 +45,7 @@ async function main() {
         price: 165000,
         category: "supplement",
         stock: 70,
-        imageUrl: "https://images.iherb.com/l/NOW-01522-9.jpg",
+        imageUrl: u("yY145j0NdOQ"),
       },
       {
         name: "بیوتین ۱۰۰۰۰ میکروگرم NOW Foods",
@@ -50,7 +53,7 @@ async function main() {
         price: 195000,
         category: "supplement",
         stock: 55,
-        imageUrl: "https://images.iherb.com/l/NOW-00490-9.jpg",
+        imageUrl: u("EUlDhZSyMpg"),
       },
       {
         name: "منیزیم ۴۰۰ میلی‌گرم NOW Foods",
@@ -58,7 +61,7 @@ async function main() {
         price: 175000,
         category: "supplement",
         stock: 40,
-        imageUrl: "https://images.iherb.com/l/NOW-01300-9.jpg",
+        imageUrl: u("WAgSCeCGB5Y"),
       },
       {
         name: "مولتی ویتامین زنانه Optimum Nutrition",
@@ -66,7 +69,7 @@ async function main() {
         price: 320000,
         category: "supplement",
         stock: 35,
-        imageUrl: "https://images.iherb.com/l/OPN-00007-9.jpg",
+        imageUrl: u("ktBXHKC50vc"),
       },
       {
         name: "مولتی ویتامین مردانه Optimum Nutrition",
@@ -74,7 +77,7 @@ async function main() {
         price: 310000,
         category: "supplement",
         stock: 35,
-        imageUrl: "https://images.iherb.com/l/OPN-00008-9.jpg",
+        imageUrl: u("kNqkjBgvZiI"),
       },
       {
         name: "کلاژن پپتید ۵۰۰۰ میلی‌گرم",
@@ -82,7 +85,7 @@ async function main() {
         price: 480000,
         category: "supplement",
         stock: 25,
-        imageUrl: "https://images.iherb.com/l/NFS-00001-9.jpg",
+        imageUrl: u("gd5LLgE-4Ps"),
       },
 
       // ─── پوستی ────────────────────────────────────────────────
@@ -92,7 +95,7 @@ async function main() {
         price: 390000,
         category: "skincare",
         stock: 30,
-        imageUrl: "https://images.iherb.com/l/TOC-02230-9.jpg",
+        imageUrl: u("96vRihviwac"),
       },
       {
         name: "ضدآفتاب SPF50+ Bioderma Photoderm",
@@ -100,7 +103,7 @@ async function main() {
         price: 520000,
         category: "skincare",
         stock: 28,
-        imageUrl: "https://images.iherb.com/l/BDM-01800-9.jpg",
+        imageUrl: u("3Uj7ttuo5kk"),
       },
       {
         name: "کرم مرطوب‌کننده Cetaphil",
@@ -108,7 +111,7 @@ async function main() {
         price: 340000,
         category: "skincare",
         stock: 40,
-        imageUrl: "https://images.iherb.com/l/CTF-01025-9.jpg",
+        imageUrl: u("eHE5l7cJVRY"),
       },
       {
         name: "تونر Niacinamide 10% The Ordinary",
@@ -116,7 +119,7 @@ async function main() {
         price: 275000,
         category: "skincare",
         stock: 35,
-        imageUrl: "https://images.iherb.com/l/TOC-02238-9.jpg",
+        imageUrl: u("RLxWVl7dCg8"),
       },
       {
         name: "سرم رتینول ۰.۵٪ CeraVe",
@@ -124,7 +127,7 @@ async function main() {
         price: 450000,
         category: "skincare",
         stock: 20,
-        imageUrl: "https://images.iherb.com/l/CVE-03124-9.jpg",
+        imageUrl: u("KiQt6CC0BvY"),
       },
       {
         name: "فوم شستشو CeraVe Foaming",
@@ -132,7 +135,7 @@ async function main() {
         price: 295000,
         category: "skincare",
         stock: 45,
-        imageUrl: "https://images.iherb.com/l/CVE-03120-9.jpg",
+        imageUrl: u("XanILp6v_Eg"),
       },
       {
         name: "میسلار واتر Garnier Micellar",
@@ -140,7 +143,7 @@ async function main() {
         price: 220000,
         category: "skincare",
         stock: 50,
-        imageUrl: "https://images.iherb.com/l/GNR-06534-9.jpg",
+        imageUrl: u("RJ0v-mj0Yxs"),
       },
       {
         name: "ماسک صورت Hyaluronic Acid",
@@ -148,7 +151,7 @@ async function main() {
         price: 185000,
         category: "skincare",
         stock: 60,
-        imageUrl: "https://images.iherb.com/l/MEG-00025-9.jpg",
+        imageUrl: u("DNohKoNoKEk"),
       },
 
       // ─── ورزشی ────────────────────────────────────────────────
@@ -158,7 +161,7 @@ async function main() {
         price: 2850000,
         category: "sport",
         stock: 15,
-        imageUrl: "https://images.iherb.com/l/OPN-00009-9.jpg",
+        imageUrl: u("R23MqZKCBcM"),
       },
       {
         name: "کراتین مونوهیدرات Creapure NOW Sports",
@@ -166,7 +169,7 @@ async function main() {
         price: 680000,
         category: "sport",
         stock: 30,
-        imageUrl: "https://images.iherb.com/l/NOW-02967-9.jpg",
+        imageUrl: u("FQsYjtIPoTM"),
       },
       {
         name: "BCAA 2:1:1 Optimum Nutrition",
@@ -174,7 +177,7 @@ async function main() {
         price: 520000,
         category: "sport",
         stock: 25,
-        imageUrl: "https://images.iherb.com/l/OPN-00016-9.jpg",
+        imageUrl: u("MUlIfSNODXE"),
       },
       {
         name: "پری‌ورکاوت C4 Original Cellucor",
@@ -182,7 +185,7 @@ async function main() {
         price: 890000,
         category: "sport",
         stock: 20,
-        imageUrl: "https://images.iherb.com/l/CLL-80003-9.jpg",
+        imageUrl: u("ENhnTZfDfaA"),
       },
       {
         name: "گلوتامین NOW Sports",
@@ -190,7 +193,7 @@ async function main() {
         price: 420000,
         category: "sport",
         stock: 30,
-        imageUrl: "https://images.iherb.com/l/NOW-02974-9.jpg",
+        imageUrl: u("DvunqLOsKco"),
       },
       {
         name: "ایزوله پروتئین وی Dymatize ISO100",
@@ -198,7 +201,7 @@ async function main() {
         price: 3200000,
         category: "sport",
         stock: 12,
-        imageUrl: "https://images.iherb.com/l/DYM-01400-9.jpg",
+        imageUrl: u("RB5aw1rOG3k"),
       },
       {
         name: "ZMA (زینک + منیزیم + B6) NOW Sports",
@@ -206,7 +209,7 @@ async function main() {
         price: 310000,
         category: "sport",
         stock: 35,
-        imageUrl: "https://images.iherb.com/l/NOW-02952-9.jpg",
+        imageUrl: u("rRBtKW_aw_U"),
       },
     ],
   });

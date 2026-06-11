@@ -87,7 +87,7 @@ export default async function ProductPage({ params }: Props) {
         </div>
 
         {/* product detail */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, marginBottom: 64, alignItems: 'start' }}>
+        <div className="product-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, marginBottom: 64, alignItems: 'start' }}>
 
           {/* image */}
           <div style={{

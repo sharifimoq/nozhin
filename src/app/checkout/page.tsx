@@ -4,6 +4,7 @@ import { useCartStore } from "@/store/cartStore";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { s, btn, input, card, font } from '@/lib/style';
+import ToastContainer, { showToast } from "@/components/Toast";
 
 function CheckoutContent() {
   const { items, totalPrice, clearCart } = useCartStore();
@@ -60,13 +61,14 @@ function CheckoutContent() {
 
   const handlePayment = async () => {
     if (!form.name || !form.email || !form.mobile) {
-      alert("لطفاً نام، ایمیل و موبایل رو پر کن");
+      showToast("لطفاً نام، ایمیل و موبایل رو پر کن", "error");
       return;
     }
     setLoading(true);
     localStorage.setItem("pendingOrder", JSON.stringify({
       name: form.name, email: form.email, mobile: form.mobile,
       address: form.address, total: finalTotal, items,
+      couponCode: couponDiscount > 0 ? couponCode : undefined,
     }));
     const res = await fetch("/api/payment/request", {
       method: "POST",
@@ -77,7 +79,7 @@ function CheckoutContent() {
     if (data.url) {
       window.location.href = data.url;
     } else {
-      alert("خطا در اتصال به درگاه پرداخت — لطفاً دوباره تلاش کن");
+      showToast("خطا در اتصال به درگاه پرداخت — لطفاً دوباره تلاش کن", "error");
       setLoading(false);
     }
   };
@@ -136,6 +138,7 @@ function CheckoutContent() {
   // صفحه اصلی checkout
   return (
     <main style={{ minHeight: "100vh", background: s.cream, fontFamily: font, direction: "rtl" }}>
+      <ToastContainer />
 
       {/* Navbar */}
       <nav style={{

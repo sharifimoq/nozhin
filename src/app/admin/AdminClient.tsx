@@ -194,7 +194,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
         </div>
 
         {/* تب‌ها */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 20, background: "white", padding: "6px", borderRadius: 50, border: `1px solid ${s.border}`, width: "fit-content", flexWrap: "wrap" }}>
+        <div className="admin-tabs" style={{ display: "flex", gap: 8, marginBottom: 20, background: "white", padding: "6px", borderRadius: 50, border: `1px solid ${s.border}`, width: "fit-content", flexWrap: "wrap" }}>
           {tabBtn("محصولات", "products", stats.products)}
           {tabBtn("سفارشات", "orders", stats.orders)}
           {tabBtn("کاربران", "users", stats.users)}
@@ -248,7 +248,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
               </div>
             )}
 
-            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <div className="admin-table-wrap"><table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#F9FBF9" }}>
                   {["نام محصول", "دسته", "قیمت (تومان)", "موجودی", "عملیات"].map((h) => (
@@ -315,7 +315,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
                   </>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             {products.length === 0 && (
               <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز محصولی اضافه نشده</div>
             )}
@@ -338,7 +338,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
                 />
               </div>
             </div>
-            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <div className="admin-table-wrap"><table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#F9FBF9" }}>
                   {["نام مشتری", "موبایل", "مبلغ (تومان)", "وضعیت", "تاریخ", "کد پیگیری"].map((h) => (
@@ -381,7 +381,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             {orders.length === 0 && (
               <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز سفارشی ثبت نشده</div>
             )}
@@ -394,7 +394,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
             <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}` }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: s.greenDark }}>کاربران ثبت‌نام‌شده ({users.length})</h2>
             </div>
-            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <div className="admin-table-wrap"><table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#F9FBF9" }}>
                   {["نام", "ایمیل", "تاریخ عضویت"].map((h) => (
@@ -413,7 +413,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             {users.length === 0 && <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز کاربری ثبت‌نام نکرده</div>}
           </div>
         )}
@@ -467,7 +467,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
               </div>
             )}
 
-            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+            <div className="admin-table-wrap"><table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
                 <tr style={{ background: "#F9FBF9" }}>
                   {["کد", "تخفیف", "استفاده‌شده", "وضعیت", "عملیات"].map((h) => (
@@ -503,7 +503,7 @@ export default function AdminClient({ products, orders, users, coupons, stats }:
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </table></div>
             {coupons.length === 0 && <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز کد تخفیفی ساخته نشده</div>}
           </div>
         )}

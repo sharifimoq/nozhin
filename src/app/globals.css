@@ -66,9 +66,32 @@ body {
     grid-template-columns: 1fr !important;
   }
   .admin-stats {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .product-detail-grid {
     grid-template-columns: 1fr !important;
+  }
+  .coupon-form-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .admin-tabs {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+  }
+  .admin-table-wrap {
+    overflow-x: auto !important;
   }
   h1.hero-title {
     font-size: 36px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: 1fr !important;
+  }
+  .coupon-form-grid {
+    grid-template-columns: 1fr !important;
   }
 }

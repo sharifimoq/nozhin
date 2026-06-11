@@ -16,7 +16,7 @@ export async function PATCH(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const { name, email, mobile, address, total, items, refId } = await req.json();
+  const { name, email, mobile, address, total, items, refId, couponCode } = await req.json();
 
   const order = await prisma.order.create({
     data: {
@@ -42,6 +42,13 @@ export async function POST(req: Request) {
       },
     },
   });
+
+  if (couponCode) {
+    await prisma.coupon.updateMany({
+      where: { code: couponCode.toUpperCase(), active: true },
+      data: { usedCount: { increment: 1 } },
+    });
+  }
 
   return NextResponse.json(order);
 }
