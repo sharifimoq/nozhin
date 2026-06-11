@@ -39,6 +39,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
+  const [search, setSearch] = useState('')
   const [added, setAdded] = useState<string | null>(null)
   const addToCart = useCartStore((state) => state.addItem)
 
@@ -51,9 +52,12 @@ export default function ProductsPage() {
 
   const categories = ['all', ...Array.from(new Set(products.map((p) => p.category)))]
 
-  const filtered = activeCategory === 'all'
-    ? products
-    : products.filter((p) => p.category === activeCategory)
+  const filtered = products.filter((p) => {
+    const matchCat = activeCategory === 'all' || p.category === activeCategory
+    const q = search.trim().toLowerCase()
+    const matchSearch = !q || p.name.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)
+    return matchCat && matchSearch
+  })
 
   function handleAdd(product: Product) {
   addToCart({ id: product.id, name: product.name, price: product.price, imageUrl: product.imageUrl ?? null, quantity: 1 })
@@ -87,15 +91,40 @@ export default function ProductsPage() {
 
       {/* Header */}
       <div style={{ padding: '48px 48px 32px', borderBottom: `1px solid ${s.border}`, background: 'white' }}>
-        <h1 style={{ fontSize: 36, fontWeight: 900, color: s.greenDark, letterSpacing: -1, marginBottom: 8 }}>
-          محصولات
-        </h1>
-        <p style={{ fontSize: 14, color: s.textMuted }}>
-          {products.length} محصول معتبر برای سلامت و زیبایی
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap' }}>
+          <div>
+            <h1 style={{ fontSize: 36, fontWeight: 900, color: s.greenDark, letterSpacing: -1, marginBottom: 8 }}>
+              محصولات
+            </h1>
+            <p style={{ fontSize: 14, color: s.textMuted }}>
+              {filtered.length} محصول
+              {search && ` برای "${search}"`}
+            </p>
+          </div>
+          {/* Search */}
+          <div style={{ position: 'relative', minWidth: 260 }}>
+            <span style={{
+              position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)',
+              fontSize: 16, pointerEvents: 'none',
+            }}>🔍</span>
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="جستجو در محصولات..."
+              style={{
+                width: '100%', padding: '11px 42px 11px 14px',
+                border: `1px solid ${s.border}`, borderRadius: 50,
+                fontSize: 13, fontFamily: "'Vazirmatn', sans-serif",
+                background: s.cream, outline: 'none', color: s.text,
+                boxSizing: 'border-box',
+              }}
+            />
+          </div>
+        </div>
 
         {/* Category filters */}
-        <div style={{ display: 'flex', gap: 8, marginTop: 24 }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 24, flexWrap: 'wrap' }}>
           {categories.map((cat) => (
             <button
               key={cat}
@@ -137,21 +166,25 @@ export default function ProductsPage() {
                   background: 'white', borderRadius: 20,
                   border: `1px solid ${s.border}`, overflow: 'hidden',
                   display: 'flex', flexDirection: 'column',
-                  transition: 'box-shadow 0.2s',
+                  transition: 'box-shadow 0.2s, transform 0.15s',
                 }}
+                onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(26,58,42,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none' }}
               >
-                {/* Image area */}
-                <div style={{
-                  height: 200, background: s.greenPale,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 64,
-                }}>
-                  {product.imageUrl ? (
-                    <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    categoryIcon[product.category] ?? '📦'
-                  )}
-                </div>
+                {/* Image — کلیک به صفحه جزئیات */}
+                <Link href={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                  <div style={{
+                    height: 200, background: s.greenPale,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 64, cursor: 'pointer',
+                  }}>
+                    {product.imageUrl ? (
+                      <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      categoryIcon[product.category] ?? '📦'
+                    )}
+                  </div>
+                </Link>
 
                 {/* Info */}
                 <div style={{ padding: '20px 20px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -163,9 +196,11 @@ export default function ProductsPage() {
                     {categoryLabels[product.category] ?? product.category}
                   </div>
 
-                  <div style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 6 }}>
-                    {product.name}
-                  </div>
+                  <Link href={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 6 }}>
+                      {product.name}
+                    </div>
+                  </Link>
 
                   {product.description && (
                     <div style={{ fontSize: 12, color: s.textMuted, lineHeight: 1.7, marginBottom: 12, flex: 1 }}>

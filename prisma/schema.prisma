@@ -58,3 +58,14 @@ model OrderItem {
   price     Float
   quantity  Int
 }
+
+model Coupon {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  discount    Int
+  type        String   @default("percent")
+  maxUses     Int      @default(100)
+  usedCount   Int      @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+}

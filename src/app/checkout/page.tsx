@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useCartStore } from "@/store/cartStore";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { s, btn, input, card, font } from '@/lib/style';
 
 function CheckoutContent() {
@@ -12,6 +13,11 @@ function CheckoutContent() {
   const refId = searchParams.get("ref_id");
   const [form, setForm] = useState({ name: "", email: "", mobile: "", address: "" });
   const [loading, setLoading] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponLabel, setCouponLabel] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
 
   useEffect(() => {
     if (status === "success") {
@@ -28,26 +34,50 @@ function CheckoutContent() {
     }
   }, [status]);
 
+  const finalTotal = Math.max(0, totalPrice() - couponDiscount);
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    setCouponError("");
+    const res = await fetch("/api/coupon", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: couponCode, total: totalPrice() }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setCouponDiscount(data.discount);
+      setCouponLabel(data.label);
+      setCouponError("");
+    } else {
+      setCouponDiscount(0);
+      setCouponLabel("");
+      setCouponError(data.error);
+    }
+    setCouponLoading(false);
+  };
+
   const handlePayment = async () => {
     if (!form.name || !form.email || !form.mobile) {
-      alert("لطفاً همه فیلدها رو پر کن");
+      alert("لطفاً نام، ایمیل و موبایل رو پر کن");
       return;
     }
     setLoading(true);
     localStorage.setItem("pendingOrder", JSON.stringify({
       name: form.name, email: form.email, mobile: form.mobile,
-      address: form.address, total: totalPrice(), items,
+      address: form.address, total: finalTotal, items,
     }));
     const res = await fetch("/api/payment/request", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: totalPrice(), description: "خرید از فروشگاه نوژین", email: form.email, mobile: form.mobile }),
+      body: JSON.stringify({ amount: finalTotal, description: "خرید از فروشگاه نوژین", email: form.email, mobile: form.mobile }),
     });
     const data = await res.json();
     if (data.url) {
       window.location.href = data.url;
     } else {
-      alert("خطا در ایجاد پرداخت");
+      alert("خطا در اتصال به درگاه پرداخت — لطفاً دوباره تلاش کن");
       setLoading(false);
     }
   };
@@ -62,14 +92,26 @@ function CheckoutContent() {
   if (status === "success") {
     return (
       <main style={{ minHeight: "100vh", background: s.cream, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: font, direction: "rtl" }}>
-        <div style={{ ...card, padding: "48px", maxWidth: 400, width: "100%", textAlign: "center" }}>
+        <div style={{ ...card, padding: "48px", maxWidth: 420, width: "100%", textAlign: "center" }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>🎉</div>
           <h2 style={{ fontSize: 24, fontWeight: 900, color: s.greenDark, marginBottom: 8 }}>پرداخت موفق!</h2>
-          <p style={{ fontSize: 14, color: s.textMuted, marginBottom: 8 }}>سفارش شما ثبت شد</p>
-          <p style={{ fontSize: 12, color: s.textMuted, marginBottom: 28 }}>کد پیگیری: {refId}</p>
-          <button onClick={() => router.push("/")} style={{ ...btn.primary }}>
-            برگشت به خانه
-          </button>
+          <p style={{ fontSize: 14, color: s.textMuted, marginBottom: 8 }}>سفارشت ثبت شد و به زودی ارسال می‌شه</p>
+          {refId && (
+            <div style={{
+              background: s.cream, borderRadius: 12, padding: "10px 20px",
+              fontSize: 12, color: s.textMuted, marginBottom: 28, display: "inline-block",
+            }}>
+              کد پیگیری: <span style={{ fontFamily: "monospace", color: s.greenMid, fontWeight: 700 }}>{refId}</span>
+            </div>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <Link href="/orders" style={{ ...btn.primary, textDecoration: "none", display: "block", padding: "14px" }}>
+              مشاهده سفارشات
+            </Link>
+            <button onClick={() => router.push("/")} style={{ background: "transparent", border: "none", color: s.textMuted, fontSize: 13, cursor: "pointer", fontFamily: font }}>
+              برگشت به خانه
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -163,13 +205,53 @@ function CheckoutContent() {
                 ))}
               </div>
 
-              <div style={{
-                display: "flex", justifyContent: "space-between",
-                borderTop: `1px solid ${s.border}`, paddingTop: 16,
-                fontSize: 16, fontWeight: 900, color: s.greenDark,
-              }}>
-                <span>{totalPrice().toLocaleString("fa-IR")} تومان</span>
-                <span>مبلغ کل</span>
+              {/* کد تخفیف */}
+              <div style={{ borderTop: `1px solid ${s.border}`, paddingTop: 16, marginTop: 4 }}>
+                <label style={{ fontSize: 11, color: s.textMuted, fontWeight: 600, display: "block", marginBottom: 8 }}>
+                  کد تخفیف
+                </label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    value={couponCode}
+                    onChange={(e) => { setCouponCode(e.target.value); setCouponError(""); }}
+                    onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                    placeholder="مثلاً NOZHIN20"
+                    disabled={couponDiscount > 0}
+                    style={{
+                      flex: 1, padding: "9px 12px", border: `1px solid ${couponDiscount > 0 ? s.greenLight : s.border}`,
+                      borderRadius: 10, fontSize: 12, fontFamily: font,
+                      background: couponDiscount > 0 ? "#f0fdf4" : "white", outline: "none",
+                    }}
+                  />
+                  {couponDiscount > 0 ? (
+                    <button onClick={() => { setCouponDiscount(0); setCouponLabel(""); setCouponCode(""); }} style={{
+                      background: "#fef2f2", color: "#c0392b", border: "none", borderRadius: 10,
+                      padding: "9px 12px", fontSize: 12, cursor: "pointer", fontFamily: font, fontWeight: 600,
+                    }}>حذف</button>
+                  ) : (
+                    <button onClick={applyCoupon} disabled={couponLoading || !couponCode.trim()} style={{
+                      background: s.greenDark, color: "white", border: "none", borderRadius: 10,
+                      padding: "9px 14px", fontSize: 12, cursor: "pointer", fontFamily: font, fontWeight: 600,
+                      opacity: couponLoading || !couponCode.trim() ? 0.5 : 1,
+                    }}>{couponLoading ? "..." : "اعمال"}</button>
+                  )}
+                </div>
+                {couponError && <p style={{ fontSize: 11, color: "#c0392b", marginTop: 6 }}>{couponError}</p>}
+                {couponLabel && <p style={{ fontSize: 11, color: s.greenMid, marginTop: 6, fontWeight: 700 }}>✓ {couponLabel} اعمال شد</p>}
+              </div>
+
+              {/* جمع نهایی */}
+              <div style={{ borderTop: `1px solid ${s.border}`, paddingTop: 16, marginTop: 16 }}>
+                {couponDiscount > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: s.textMuted, marginBottom: 8 }}>
+                    <span style={{ color: "#c0392b" }}>− {couponDiscount.toLocaleString("fa-IR")} تومان</span>
+                    <span>تخفیف</span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 16, fontWeight: 900, color: s.greenDark }}>
+                  <span>{finalTotal.toLocaleString("fa-IR")} تومان</span>
+                  <span>مبلغ کل</span>
+                </div>
               </div>
 
               <button

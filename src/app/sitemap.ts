@@ -1,12 +1,23 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from "next";
+import { prisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const BASE = "https://nozhin.vercel.app";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const products = await prisma.product.findMany({ select: { id: true, createdAt: true } });
+
   return [
-    { url: 'https://nozhin.vercel.app', lastModified: new Date(), changeFrequency: 'weekly', priority: 1 },
-    { url: 'https://nozhin.vercel.app/products', lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: 'https://nozhin.vercel.app/quiz', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: 'https://nozhin.vercel.app/about', lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
-    { url: 'https://nozhin.vercel.app/login', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-    { url: 'https://nozhin.vercel.app/register', lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
-  ]
+    { url: BASE, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
+    { url: `${BASE}/products`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${BASE}/quiz`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE}/login`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/register`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
+    ...products.map((p) => ({
+      url: `${BASE}/products/${p.id}`,
+      lastModified: p.createdAt,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+  ];
 }

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ToastContainer, { showToast } from "@/components/Toast";
 
 const s = {
   cream: '#FAFAF8',
@@ -31,23 +32,33 @@ type Order = {
   address: string; total: number; status: string; refId: string | null;
   createdAt: Date; items: OrderItem[];
 };
+type UserRow = { id: string; name: string | null; email: string; createdAt: Date };
+type Coupon = { id: string; code: string; discount: number; type: string; maxUses: number; usedCount: number; active: boolean };
 type Stats = { users: number; routines: number; products: number; orders: number; revenue: number };
 
 const emptyForm = { name: "", description: "", price: "", category: "supplement", stock: "", imageUrl: "" };
+const emptyCouponForm = { code: "", discount: "", type: "percent", maxUses: "100" };
 
 const categoryLabels: Record<string, string> = {
   skincare: "مراقبت پوست", supplement: "مکمل", sport: "ورزشی",
   پوستی: "مراقبت پوست", مکمل: "مکمل", ورزشی: "ورزشی",
 };
 
-export default function AdminClient({ products, orders, stats }: { products: Product[]; orders: Order[]; stats: Stats }) {
+export default function AdminClient({ products, orders, users, coupons, stats }: {
+  products: Product[]; orders: Order[]; users: UserRow[]; coupons: Coupon[]; stats: Stats;
+}) {
   const router = useRouter();
-  const [tab, setTab] = useState<'products' | 'orders'>('products');
+  const [tab, setTab] = useState<'products' | 'orders' | 'users' | 'coupons'>('products');
   const [showAddForm, setShowAddForm] = useState(false);
   const [addForm, setAddForm] = useState(emptyForm);
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [productSearch, setProductSearch] = useState("");
+  const [orderSearch, setOrderSearch] = useState("");
+  const [couponForm, setCouponForm] = useState(emptyCouponForm);
+  const [couponSaving, setCouponSaving] = useState(false);
+  const [showCouponForm, setShowCouponForm] = useState(false);
 
   const inputStyle = {
     width: "100%", border: `1px solid ${s.border}`, borderRadius: 10,
@@ -56,15 +67,15 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
   };
 
   const handleAdd = async () => {
-    if (!addForm.name || !addForm.price) { alert("نام و قیمت الزامی است"); return; }
+    if (!addForm.name || !addForm.price) { showToast("نام و قیمت الزامی است", "error"); return; }
     setSaving(true);
     const res = await fetch("/api/products", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...addForm, price: parseFloat(addForm.price), stock: parseInt(addForm.stock) || 0, imageUrl: addForm.imageUrl || null }),
     });
-    if (res.ok) { setShowAddForm(false); setAddForm(emptyForm); router.refresh(); }
-    else alert("خطا در ذخیره محصول");
+    if (res.ok) { setShowAddForm(false); setAddForm(emptyForm); router.refresh(); showToast("محصول اضافه شد"); }
+    else showToast("خطا در ذخیره محصول", "error");
     setSaving(false);
   };
 
@@ -80,14 +91,43 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...editForm, price: parseFloat(editForm.price), stock: parseInt(editForm.stock) || 0, imageUrl: editForm.imageUrl || null }),
     });
-    if (res.ok) { setEditId(null); router.refresh(); }
-    else alert("خطا در ویرایش");
+    if (res.ok) { setEditId(null); router.refresh(); showToast("تغییرات ذخیره شد"); }
+    else showToast("خطا در ویرایش", "error");
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("مطمئنی؟")) return;
     await fetch(`/api/products/${id}`, { method: "DELETE" });
+    router.refresh();
+    showToast("محصول حذف شد");
+  };
+
+  const handleAddCoupon = async () => {
+    if (!couponForm.code || !couponForm.discount) { showToast("کد و مقدار تخفیف الزامی است", "error"); return; }
+    setCouponSaving(true);
+    const res = await fetch("/api/coupon", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(couponForm),
+    });
+    if (res.ok) { setCouponForm(emptyCouponForm); setShowCouponForm(false); router.refresh(); showToast("کد تخفیف ساخته شد"); }
+    else showToast("خطا در ساخت کوپن", "error");
+    setCouponSaving(false);
+  };
+
+  const handleDeactivateCoupon = async (id: string) => {
+    await fetch("/api/coupon", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    router.refresh();
+    showToast("کوپن غیرفعال شد");
+  };
+
+  const handleOrderStatus = async (id: string, status: string) => {
+    await fetch("/api/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status }),
+    });
     router.refresh();
   };
 
@@ -111,7 +151,7 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
     </div>
   );
 
-  const tabBtn = (label: string, key: 'products' | 'orders', count: number) => (
+  const tabBtn = (label: string, key: 'products' | 'orders' | 'users' | 'coupons', count: number) => (
     <button onClick={() => setTab(key)} style={{
       padding: "10px 24px", borderRadius: 50, fontSize: 13, fontWeight: 600,
       fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer", border: "none",
@@ -124,6 +164,7 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
 
   return (
     <main style={{ minHeight: "100vh", background: s.cream, fontFamily: "'Vazirmatn', sans-serif", direction: "rtl" }}>
+      <ToastContainer />
       <header style={{ background: "white", borderBottom: `1px solid ${s.border}`, padding: "20px 48px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <h1 style={{ fontSize: 20, fontWeight: 900, color: s.greenDark }}>پنل مدیریت نوژین</h1>
         <a href="/" style={{ fontSize: 13, color: s.textMuted, textDecoration: "none" }}>← برگشت به سایت</a>
@@ -153,16 +194,28 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
         </div>
 
         {/* تب‌ها */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 20, background: "white", padding: "6px", borderRadius: 50, border: `1px solid ${s.border}`, width: "fit-content" }}>
+        <div style={{ display: "flex", gap: 8, marginBottom: 20, background: "white", padding: "6px", borderRadius: 50, border: `1px solid ${s.border}`, width: "fit-content", flexWrap: "wrap" }}>
           {tabBtn("محصولات", "products", stats.products)}
           {tabBtn("سفارشات", "orders", stats.orders)}
+          {tabBtn("کاربران", "users", stats.users)}
+          {tabBtn("کدهای تخفیف", "coupons", coupons.length)}
         </div>
 
         {/* ─── تب محصولات ─── */}
         {tab === "products" && (
           <div style={{ background: "white", borderRadius: 20, border: `1px solid ${s.border}`, overflow: "hidden" }}>
-            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: s.greenDark }}>مدیریت محصولات</h2>
+              <div style={{ position: "relative", flex: 1, maxWidth: 280 }}>
+                <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, pointerEvents: "none" }}>🔍</span>
+                <input
+                  type="text"
+                  value={productSearch}
+                  onChange={(e) => setProductSearch(e.target.value)}
+                  placeholder="جستجو محصول..."
+                  style={{ width: "100%", padding: "8px 36px 8px 12px", border: `1px solid ${s.border}`, borderRadius: 50, fontSize: 12, fontFamily: "'Vazirmatn', sans-serif", outline: "none", boxSizing: "border-box" as const }}
+                />
+              </div>
               <button onClick={() => { setShowAddForm(!showAddForm); setEditId(null); }} style={{
                 background: s.greenDark, color: "white", border: "none", borderRadius: 50,
                 padding: "9px 22px", fontSize: 13, fontWeight: 600, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer",
@@ -204,7 +257,7 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
                 </tr>
               </thead>
               <tbody>
-                {products.map((p) => (
+                {products.filter((p) => !productSearch || p.name.toLowerCase().includes(productSearch.toLowerCase()) || (categoryLabels[p.category] ?? p.category).includes(productSearch)).map((p) => (
                   <>
                     <tr key={p.id} style={{ borderBottom: `1px solid ${s.border}` }}>
                       <td style={{ padding: "12px 16px", fontWeight: 600, color: s.text }}>{p.name}</td>
@@ -272,8 +325,18 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
         {/* ─── تب سفارشات ─── */}
         {tab === "orders" && (
           <div style={{ background: "white", borderRadius: 20, border: `1px solid ${s.border}`, overflow: "hidden" }}>
-            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}` }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}`, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: s.greenDark }}>سفارشات</h2>
+              <div style={{ position: "relative", maxWidth: 260 }}>
+                <span style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", fontSize: 14, pointerEvents: "none" }}>🔍</span>
+                <input
+                  type="text"
+                  value={orderSearch}
+                  onChange={(e) => setOrderSearch(e.target.value)}
+                  placeholder="جستجو نام یا ایمیل..."
+                  style={{ width: "100%", padding: "8px 36px 8px 12px", border: `1px solid ${s.border}`, borderRadius: 50, fontSize: 12, fontFamily: "'Vazirmatn', sans-serif", outline: "none", boxSizing: "border-box" as const }}
+                />
+              </div>
             </div>
             <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
               <thead>
@@ -284,7 +347,7 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
                 </tr>
               </thead>
               <tbody>
-                {orders.map((o) => (
+                {orders.filter((o) => !orderSearch || o.name.includes(orderSearch) || o.email.includes(orderSearch) || o.mobile.includes(orderSearch)).map((o) => (
                   <tr key={o.id} style={{ borderBottom: `1px solid ${s.border}` }}>
                     <td style={{ padding: "12px 16px", fontWeight: 600, color: s.text }}>
                       {o.name}
@@ -293,13 +356,21 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
                     <td style={{ padding: "12px 16px", color: s.textMuted }}>{o.mobile}</td>
                     <td style={{ padding: "12px 16px", color: s.greenMid, fontWeight: 700 }}>{o.total.toLocaleString("fa-IR")}</td>
                     <td style={{ padding: "12px 16px" }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 50,
-                        background: o.status === "paid" ? s.greenPale : "#FEF3C7",
-                        color: o.status === "paid" ? s.greenMid : "#92400E",
-                      }}>
-                        {o.status === "paid" ? "پرداخت‌شده" : "در انتظار"}
-                      </span>
+                      <select
+                        value={o.status}
+                        onChange={(e) => handleOrderStatus(o.id, e.target.value)}
+                        style={{
+                          fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 50,
+                          border: "none", cursor: "pointer", fontFamily: "'Vazirmatn', sans-serif",
+                          background: o.status === "paid" ? s.greenPale : o.status === "shipped" ? "#EFF6FF" : o.status === "delivered" ? "#F0FDF4" : "#FEF3C7",
+                          color: o.status === "paid" ? s.greenMid : o.status === "shipped" ? "#1D4ED8" : o.status === "delivered" ? "#166534" : "#92400E",
+                        }}
+                      >
+                        <option value="pending">در انتظار</option>
+                        <option value="paid">پرداخت‌شده</option>
+                        <option value="shipped">ارسال‌شده</option>
+                        <option value="delivered">تحویل‌شده</option>
+                      </select>
                     </td>
                     <td style={{ padding: "12px 16px", color: s.textMuted, fontSize: 12 }}>
                       {new Date(o.createdAt).toLocaleDateString("fa-IR")}
@@ -314,6 +385,126 @@ export default function AdminClient({ products, orders, stats }: { products: Pro
             {orders.length === 0 && (
               <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز سفارشی ثبت نشده</div>
             )}
+          </div>
+        )}
+
+        {/* ─── تب کاربران ─── */}
+        {tab === "users" && (
+          <div style={{ background: "white", borderRadius: 20, border: `1px solid ${s.border}`, overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}` }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: s.greenDark }}>کاربران ثبت‌نام‌شده ({users.length})</h2>
+            </div>
+            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ background: "#F9FBF9" }}>
+                  {["نام", "ایمیل", "تاریخ عضویت"].map((h) => (
+                    <th key={h} style={{ textAlign: "right", padding: "12px 16px", color: s.textMuted, fontWeight: 600, borderBottom: `1px solid ${s.border}` }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((u) => (
+                  <tr key={u.id} style={{ borderBottom: `1px solid ${s.border}` }}>
+                    <td style={{ padding: "12px 16px", fontWeight: 600, color: s.text }}>{u.name ?? "—"}</td>
+                    <td style={{ padding: "12px 16px", color: s.textMuted }}>{u.email}</td>
+                    <td style={{ padding: "12px 16px", color: s.textMuted, fontSize: 12 }}>
+                      {new Date(u.createdAt).toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {users.length === 0 && <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز کاربری ثبت‌نام نکرده</div>}
+          </div>
+        )}
+
+        {/* ─── تب کوپن‌ها ─── */}
+        {tab === "coupons" && (
+          <div style={{ background: "white", borderRadius: 20, border: `1px solid ${s.border}`, overflow: "hidden" }}>
+            <div style={{ padding: "20px 24px", borderBottom: `1px solid ${s.border}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h2 style={{ fontSize: 16, fontWeight: 700, color: s.greenDark }}>کدهای تخفیف</h2>
+              <button onClick={() => setShowCouponForm(!showCouponForm)} style={{
+                background: s.greenDark, color: "white", border: "none", borderRadius: 50,
+                padding: "9px 22px", fontSize: 13, fontWeight: 600, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer",
+              }}>
+                {showCouponForm ? "انصراف" : "+ کد جدید"}
+              </button>
+            </div>
+
+            {showCouponForm && (
+              <div style={{ padding: "20px 24px", background: s.greenPale, borderBottom: `1px solid ${s.border}` }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, marginBottom: 12 }}>
+                  <div>
+                    <label style={{ fontSize: 11, color: s.textMuted, display: "block", marginBottom: 4, fontWeight: 600 }}>کد تخفیف</label>
+                    <input value={couponForm.code} onChange={(e) => setCouponForm({ ...couponForm, code: e.target.value.toUpperCase() })}
+                      placeholder="مثلاً NOZHIN20" style={{ width: "100%", border: `1px solid ${s.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: s.textMuted, display: "block", marginBottom: 4, fontWeight: 600 }}>مقدار تخفیف</label>
+                    <input type="number" value={couponForm.discount} onChange={(e) => setCouponForm({ ...couponForm, discount: e.target.value })}
+                      placeholder="مثلاً 20" style={{ width: "100%", border: `1px solid ${s.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }} />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: s.textMuted, display: "block", marginBottom: 4, fontWeight: 600 }}>نوع</label>
+                    <select value={couponForm.type} onChange={(e) => setCouponForm({ ...couponForm, type: e.target.value })}
+                      style={{ width: "100%", border: `1px solid ${s.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }}>
+                      <option value="percent">درصدی</option>
+                      <option value="fixed">مبلغ ثابت (تومان)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, color: s.textMuted, display: "block", marginBottom: 4, fontWeight: 600 }}>حداکثر استفاده</label>
+                    <input type="number" value={couponForm.maxUses} onChange={(e) => setCouponForm({ ...couponForm, maxUses: e.target.value })}
+                      style={{ width: "100%", border: `1px solid ${s.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, fontFamily: "'Vazirmatn', sans-serif", outline: "none" }} />
+                  </div>
+                </div>
+                <button onClick={handleAddCoupon} disabled={couponSaving} style={{
+                  background: s.greenDark, color: "white", border: "none", borderRadius: 50,
+                  padding: "10px 28px", fontSize: 13, fontWeight: 700, fontFamily: "'Vazirmatn', sans-serif", cursor: "pointer", opacity: couponSaving ? 0.6 : 1,
+                }}>
+                  {couponSaving ? "در حال ذخیره..." : "ذخیره کد"}
+                </button>
+              </div>
+            )}
+
+            <table style={{ width: "100%", fontSize: 13, borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ background: "#F9FBF9" }}>
+                  {["کد", "تخفیف", "استفاده‌شده", "وضعیت", "عملیات"].map((h) => (
+                    <th key={h} style={{ textAlign: "right", padding: "12px 16px", color: s.textMuted, fontWeight: 600, borderBottom: `1px solid ${s.border}` }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {coupons.map((c) => (
+                  <tr key={c.id} style={{ borderBottom: `1px solid ${s.border}` }}>
+                    <td style={{ padding: "12px 16px", fontWeight: 700, color: s.greenDark, fontFamily: "monospace", letterSpacing: 1 }}>{c.code}</td>
+                    <td style={{ padding: "12px 16px", color: s.greenMid, fontWeight: 700 }}>
+                      {c.discount}{c.type === "percent" ? "٪" : " تومان"}
+                    </td>
+                    <td style={{ padding: "12px 16px", color: s.textMuted }}>{c.usedCount} از {c.maxUses}</td>
+                    <td style={{ padding: "12px 16px" }}>
+                      <span style={{
+                        fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 50,
+                        background: c.active ? s.greenPale : "#fef2f2",
+                        color: c.active ? s.greenMid : s.red,
+                      }}>
+                        {c.active ? "فعال" : "غیرفعال"}
+                      </span>
+                    </td>
+                    <td style={{ padding: "12px 16px" }}>
+                      {c.active && (
+                        <button onClick={() => handleDeactivateCoupon(c.id)} style={{
+                          color: s.red, background: "none", border: "none", fontSize: 12,
+                          cursor: "pointer", fontFamily: "'Vazirmatn', sans-serif",
+                        }}>غیرفعال کن</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {coupons.length === 0 && <div style={{ textAlign: "center", padding: "48px 0", color: s.textMuted, fontSize: 14 }}>هنوز کد تخفیفی ساخته نشده</div>}
           </div>
         )}
 

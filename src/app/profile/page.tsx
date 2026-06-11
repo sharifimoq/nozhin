@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { s, font } from '@/lib/style';
+import LogoutButton from "./LogoutButton";
 
 type Routine = {
   id: string;
@@ -64,12 +65,15 @@ export default async function Profile() {
             </div>
             <div style={{ fontSize: 13, color: s.textMuted }}>{user?.email}</div>
           </div>
-          <a href="/quiz" style={{
-            background: s.greenDark, color: "white", padding: "10px 24px",
-            borderRadius: 50, fontSize: 13, fontWeight: 600, textDecoration: "none",
-          }}>
-            روتین جدید
-          </a>
+          <div style={{ display: "flex", gap: 10 }}>
+            <a href="/quiz" style={{
+              background: s.greenDark, color: "white", padding: "10px 24px",
+              borderRadius: 50, fontSize: 13, fontWeight: 600, textDecoration: "none",
+            }}>
+              روتین جدید
+            </a>
+            <LogoutButton />
+          </div>
         </div>
 
         {/* روتین‌های قبلی */}

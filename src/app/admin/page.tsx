@@ -12,11 +12,12 @@ export default async function Admin() {
     redirect("/login");
   }
 
-  const [products, orders, users, routines] = await Promise.all([
+  const [products, orders, userList, routines, coupons] = await Promise.all([
     prisma.product.findMany({ orderBy: { createdAt: "desc" } }),
     prisma.order.findMany({ include: { items: true }, orderBy: { createdAt: "desc" } }),
-    prisma.user.count(),
+    prisma.user.findMany({ select: { id: true, name: true, email: true, createdAt: true }, orderBy: { createdAt: "desc" } }),
     prisma.routine.count(),
+    prisma.coupon.findMany({ orderBy: { createdAt: "desc" } }),
   ]);
 
   const revenue = orders.filter((o) => o.status === "paid").reduce((sum, o) => sum + o.total, 0);
@@ -25,7 +26,9 @@ export default async function Admin() {
     <AdminClient
       products={products}
       orders={orders}
-      stats={{ users, routines, products: products.length, orders: orders.length, revenue }}
+      users={userList}
+      coupons={coupons}
+      stats={{ users: userList.length, routines, products: products.length, orders: orders.length, revenue }}
     />
   );
 }

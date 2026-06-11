@@ -9,6 +9,12 @@ export async function GET() {
   return NextResponse.json(orders);
 }
 
+export async function PATCH(req: Request) {
+  const { id, status } = await req.json();
+  const order = await prisma.order.update({ where: { id }, data: { status } });
+  return NextResponse.json(order);
+}
+
 export async function POST(req: Request) {
   const { name, email, mobile, address, total, items, refId } = await req.json();
 

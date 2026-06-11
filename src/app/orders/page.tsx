@@ -68,10 +68,18 @@ export default async function OrdersPage() {
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <span style={{
                       fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 50,
-                      background: order.status === "paid" ? s.greenPale : "#FEF3C7",
-                      color: order.status === "paid" ? s.greenMid : "#92400E",
+                      background:
+                        order.status === "delivered" ? "#F0FDF4" :
+                        order.status === "shipped"   ? "#EFF6FF" :
+                        order.status === "paid"      ? s.greenPale : "#FEF3C7",
+                      color:
+                        order.status === "delivered" ? "#166534" :
+                        order.status === "shipped"   ? "#1D4ED8" :
+                        order.status === "paid"      ? s.greenMid : "#92400E",
                     }}>
-                      {order.status === "paid" ? "✓ پرداخت‌شده" : "در انتظار پرداخت"}
+                      {order.status === "delivered" ? "✓ تحویل داده شد" :
+                       order.status === "shipped"   ? "🚚 در حال ارسال" :
+                       order.status === "paid"      ? "✓ پرداخت‌شده" : "در انتظار"}
                     </span>
                     <span style={{ fontSize: 12, color: s.textMuted }}>
                       {new Date(order.createdAt).toLocaleDateString("fa-IR", { year: "numeric", month: "long", day: "numeric" })}

@@ -1,7 +1,10 @@
-import "dotenv/config";
-import { PrismaClient } from "@/generated/prisma";
+import * as dotenv from "dotenv";
+dotenv.config({ path: ".env.local" });
+import { PrismaClient } from "./src/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   await prisma.product.deleteMany();
@@ -15,23 +18,23 @@ async function main() {
         price: 185000,
         category: "supplement",
         stock: 60,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Vitamin+C",
+        imageUrl: "https://images.iherb.com/l/NMD-00173-9.jpg",
       },
       {
-        name: "امگا ۳ ۱۲۰۰ میلی‌گرم Naturo Sciences",
-        description: "تقویت قلب، مغز و کاهش التهاب. روغن ماهی تصفیه‌شده. ۹۰ عدد سافت ژل.",
+        name: "امگا ۳ ۱۲۰۰ میلی‌گرم NOW Foods",
+        description: "تقویت قلب، مغز و کاهش التهاب. روغن ماهی تصفیه‌شده. ۱۸۰ عدد سافت ژل.",
         price: 245000,
         category: "supplement",
         stock: 45,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Omega+3",
+        imageUrl: "https://images.iherb.com/l/NOW-01700-9.jpg",
       },
       {
-        name: "ویتامین D3 + K2 2000 IU",
-        description: "تقویت استخوان، سیستم ایمنی و خلق‌وخو. ترکیب D3 و K2 برای جذب بهتر. ۶۰ کپسول.",
+        name: "ویتامین D3 + K2 2000 IU NOW Foods",
+        description: "تقویت استخوان، سیستم ایمنی و خلق‌وخو. ترکیب D3 و K2 برای جذب بهتر. ۱۲۰ کپسول.",
         price: 210000,
         category: "supplement",
         stock: 50,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Vit+D3+K2",
+        imageUrl: "https://images.iherb.com/l/NOW-00369-9.jpg",
       },
       {
         name: "زینک ۵۰ میلی‌گرم NOW Foods",
@@ -39,15 +42,15 @@ async function main() {
         price: 165000,
         category: "supplement",
         stock: 70,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Zinc",
+        imageUrl: "https://images.iherb.com/l/NOW-01522-9.jpg",
       },
       {
-        name: "بیوتین ۱۰۰۰۰ میکروگرم",
-        description: "تقویت مو، ناخن و پوست. فرمول زیست‌فراهم. ۱۲۰ قرص. مناسب موهای ریزش‌دار.",
+        name: "بیوتین ۱۰۰۰۰ میکروگرم NOW Foods",
+        description: "تقویت مو، ناخن و پوست. فرمول زیست‌فراهم. ۱۲۰ کپسول. مناسب موهای ریزش‌دار.",
         price: 195000,
         category: "supplement",
         stock: 55,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Biotin",
+        imageUrl: "https://images.iherb.com/l/NOW-00490-9.jpg",
       },
       {
         name: "منیزیم ۴۰۰ میلی‌گرم NOW Foods",
@@ -55,7 +58,7 @@ async function main() {
         price: 175000,
         category: "supplement",
         stock: 40,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Magnesium",
+        imageUrl: "https://images.iherb.com/l/NOW-01300-9.jpg",
       },
       {
         name: "مولتی ویتامین زنانه Optimum Nutrition",
@@ -63,7 +66,7 @@ async function main() {
         price: 320000,
         category: "supplement",
         stock: 35,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Multi+Women",
+        imageUrl: "https://images.iherb.com/l/OPN-00007-9.jpg",
       },
       {
         name: "مولتی ویتامین مردانه Optimum Nutrition",
@@ -71,7 +74,7 @@ async function main() {
         price: 310000,
         category: "supplement",
         stock: 35,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Multi+Men",
+        imageUrl: "https://images.iherb.com/l/OPN-00008-9.jpg",
       },
       {
         name: "کلاژن پپتید ۵۰۰۰ میلی‌گرم",
@@ -79,7 +82,7 @@ async function main() {
         price: 480000,
         category: "supplement",
         stock: 25,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Collagen",
+        imageUrl: "https://images.iherb.com/l/NFS-00001-9.jpg",
       },
 
       // ─── پوستی ────────────────────────────────────────────────
@@ -89,7 +92,7 @@ async function main() {
         price: 390000,
         category: "skincare",
         stock: 30,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Vit+C+Serum",
+        imageUrl: "https://images.iherb.com/l/TOC-02230-9.jpg",
       },
       {
         name: "ضدآفتاب SPF50+ Bioderma Photoderm",
@@ -97,7 +100,7 @@ async function main() {
         price: 520000,
         category: "skincare",
         stock: 28,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=SPF50+Bioderma",
+        imageUrl: "https://images.iherb.com/l/BDM-01800-9.jpg",
       },
       {
         name: "کرم مرطوب‌کننده Cetaphil",
@@ -105,7 +108,7 @@ async function main() {
         price: 340000,
         category: "skincare",
         stock: 40,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Cetaphil",
+        imageUrl: "https://images.iherb.com/l/CTF-01025-9.jpg",
       },
       {
         name: "تونر Niacinamide 10% The Ordinary",
@@ -113,7 +116,7 @@ async function main() {
         price: 275000,
         category: "skincare",
         stock: 35,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Niacinamide",
+        imageUrl: "https://images.iherb.com/l/TOC-02238-9.jpg",
       },
       {
         name: "سرم رتینول ۰.۵٪ CeraVe",
@@ -121,7 +124,7 @@ async function main() {
         price: 450000,
         category: "skincare",
         stock: 20,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Retinol+CeraVe",
+        imageUrl: "https://images.iherb.com/l/CVE-03124-9.jpg",
       },
       {
         name: "فوم شستشو CeraVe Foaming",
@@ -129,7 +132,7 @@ async function main() {
         price: 295000,
         category: "skincare",
         stock: 45,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=CeraVe+Foam",
+        imageUrl: "https://images.iherb.com/l/CVE-03120-9.jpg",
       },
       {
         name: "میسلار واتر Garnier Micellar",
@@ -137,7 +140,7 @@ async function main() {
         price: 220000,
         category: "skincare",
         stock: 50,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Garnier+Micellar",
+        imageUrl: "https://images.iherb.com/l/GNR-06534-9.jpg",
       },
       {
         name: "ماسک صورت Hyaluronic Acid",
@@ -145,41 +148,41 @@ async function main() {
         price: 185000,
         category: "skincare",
         stock: 60,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=HA+Mask",
+        imageUrl: "https://images.iherb.com/l/MEG-00025-9.jpg",
       },
 
       // ─── ورزشی ────────────────────────────────────────────────
       {
         name: "پروتئین وی Gold Standard Optimum Nutrition",
-        description: "۲۴ گرم پروتئین در هر سرویس. ۵ پوند. طعم شکلات. ایزوله + کانسانتره. یکی از بهترین برندهای دنیا.",
+        description: "۲۴ گرم پروتئین در هر سرویس. ۵ پوند. طعم شکلات. ایزوله + کانسانتره.",
         price: 2850000,
         category: "sport",
         stock: 15,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Whey+ON",
+        imageUrl: "https://images.iherb.com/l/OPN-00009-9.jpg",
       },
       {
-        name: "کراتین مونوهیدرات Creapure",
+        name: "کراتین مونوهیدرات Creapure NOW Sports",
         description: "خالص‌ترین کراتین بازار. افزایش قدرت و حجم. ۵۰۰ گرم. بدون مزه.",
         price: 680000,
         category: "sport",
         stock: 30,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Creatine",
+        imageUrl: "https://images.iherb.com/l/NOW-02967-9.jpg",
       },
       {
-        name: "BCAA 2:1:1 MuscleTech",
-        description: "آمینواسیدهای شاخه‌دار برای ریکاوری و جلوگیری از کاتابولیسم. ۳۰ سرویس. طعم هندوانه.",
+        name: "BCAA 2:1:1 Optimum Nutrition",
+        description: "آمینواسیدهای شاخه‌دار برای ریکاوری و جلوگیری از کاتابولیسم. ۳۰ سرویس.",
         price: 520000,
         category: "sport",
         stock: 25,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=BCAA",
+        imageUrl: "https://images.iherb.com/l/OPN-00016-9.jpg",
       },
       {
         name: "پری‌ورکاوت C4 Original Cellucor",
-        description: "انرژی، تمرکز و پمپ عضلانی. کافئین ۱۵۰ میلی‌گرم + بتا-آلانین. ۳۰ سرویس. طعم انار.",
+        description: "انرژی، تمرکز و پمپ عضلانی. کافئین ۱۵۰ میلی‌گرم + بتا-آلانین. ۳۰ سرویس.",
         price: 890000,
         category: "sport",
         stock: 20,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=C4+Pre-Workout",
+        imageUrl: "https://images.iherb.com/l/CLL-80003-9.jpg",
       },
       {
         name: "گلوتامین NOW Sports",
@@ -187,7 +190,7 @@ async function main() {
         price: 420000,
         category: "sport",
         stock: 30,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=Glutamine",
+        imageUrl: "https://images.iherb.com/l/NOW-02974-9.jpg",
       },
       {
         name: "ایزوله پروتئین وی Dymatize ISO100",
@@ -195,20 +198,20 @@ async function main() {
         price: 3200000,
         category: "sport",
         stock: 12,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=ISO100",
+        imageUrl: "https://images.iherb.com/l/DYM-01400-9.jpg",
       },
       {
-        name: "ZMA (زینک + منیزیم + B6) NOW Foods",
+        name: "ZMA (زینک + منیزیم + B6) NOW Sports",
         description: "بهبود خواب، افزایش تستوسترون طبیعی و ریکاوری شبانه. ۹۰ کپسول.",
         price: 310000,
         category: "sport",
         stock: 35,
-        imageUrl: "https://placehold.co/400x400/D8F3DC/1A3A2A?text=ZMA",
+        imageUrl: "https://images.iherb.com/l/NOW-02952-9.jpg",
       },
     ],
   });
 
-  console.log("✅ ۲۶ محصول واقعی اضافه شدن!");
+  console.log("✅ ۲۶ محصول با تصاویر واقعی اضافه شدن!");
 }
 
 main()

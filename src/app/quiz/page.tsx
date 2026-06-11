@@ -244,21 +244,29 @@ export default function Quiz() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: 12 }}>
-                <button onClick={reset} style={{
-                  flex: 1, background: 'transparent', color: s.greenMid,
-                  border: `1px solid ${s.greenMid}`, padding: '12px', borderRadius: 50,
-                  fontSize: 13, fontWeight: 600, fontFamily: "'Vazirmatn', sans-serif", cursor: 'pointer',
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <button onClick={reset} style={{
+                    flex: 1, background: 'transparent', color: s.greenMid,
+                    border: `1px solid ${s.greenMid}`, padding: '12px', borderRadius: 50,
+                    fontSize: 13, fontWeight: 600, fontFamily: "'Vazirmatn', sans-serif", cursor: 'pointer',
+                  }}>
+                    دوباره امتحان کن
+                  </button>
+                  <a href="/cart" style={{
+                    flex: 1, background: s.greenDark, color: 'white',
+                    padding: '12px', borderRadius: 50, fontSize: 13, fontWeight: 600,
+                    textAlign: 'center', textDecoration: 'none',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    مشاهده سبد خرید
+                  </a>
+                </div>
+                <a href="/products" style={{
+                  textAlign: 'center', fontSize: 12, color: s.textMuted,
+                  textDecoration: 'none', padding: '8px',
                 }}>
-                  دوباره امتحان کن
-                </button>
-                <a href="/cart" style={{
-                  flex: 1, background: s.greenDark, color: 'white',
-                  padding: '12px', borderRadius: 50, fontSize: 13, fontWeight: 600,
-                  textAlign: 'center', textDecoration: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  مشاهده سبد خرید
+                  مشاهده همه محصولات ←
                 </a>
               </div>
             </div>
@@ -344,11 +352,18 @@ export default function Quiz() {
 
               {/* مسیر و شماره سوال */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                <button onClick={reset} style={{
-                  background: 'none', border: 'none', color: s.textMuted,
-                  fontSize: 12, cursor: 'pointer', fontFamily: "'Vazirmatn', sans-serif",
-                }}>
-                  ← تغییر مسیر
+                <button
+                  onClick={() => {
+                    if (current === 0) reset();
+                    else { setCurrent(current - 1); setAnswers(answers.slice(0, -1)); }
+                  }}
+                  style={{
+                    background: 'none', border: 'none', color: s.textMuted,
+                    fontSize: 12, cursor: 'pointer', fontFamily: "'Vazirmatn', sans-serif",
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  ← {current === 0 ? 'تغییر مسیر' : 'سوال قبلی'}
                 </button>
                 <div style={{
                   background: s.greenPale, color: s.greenMid, fontSize: 11,
