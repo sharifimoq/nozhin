@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/store/cartStore'
 import NavbarActions from '@/components/NavbarActions'
 
@@ -42,6 +43,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [added, setAdded] = useState<string | null>(null)
   const addToCart = useCartStore((state) => state.addItem)
+  const router = useRouter()
 
   useEffect(() => {
     fetch('/api/products')
@@ -162,29 +164,29 @@ export default function ProductsPage() {
             {filtered.map((product) => (
               <div
                 key={product.id}
+                onClick={() => router.push(`/products/${product.id}`)}
                 style={{
                   background: 'white', borderRadius: 20,
                   border: `1px solid ${s.border}`, overflow: 'hidden',
                   display: 'flex', flexDirection: 'column',
                   transition: 'box-shadow 0.2s, transform 0.15s',
+                  cursor: 'pointer',
                 }}
                 onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 8px 32px rgba(26,58,42,0.10)'; e.currentTarget.style.transform = 'translateY(-2px)' }}
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none' }}
               >
-                {/* Image — کلیک به صفحه جزئیات */}
-                <Link href={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
-                  <div style={{
-                    height: 200, background: s.greenPale,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 64, cursor: 'pointer',
-                  }}>
-                    {product.imageUrl ? (
-                      <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                      categoryIcon[product.category] ?? '📦'
-                    )}
-                  </div>
-                </Link>
+                {/* Image */}
+                <div style={{
+                  height: 200, background: s.greenPale,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 64,
+                }}>
+                  {product.imageUrl ? (
+                    <img src={product.imageUrl} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    categoryIcon[product.category] ?? '📦'
+                  )}
+                </div>
 
                 {/* Info */}
                 <div style={{ padding: '20px 20px 16px', flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -196,11 +198,9 @@ export default function ProductsPage() {
                     {categoryLabels[product.category] ?? product.category}
                   </div>
 
-                  <Link href={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 6 }}>
-                      {product.name}
-                    </div>
-                  </Link>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: s.text, marginBottom: 6 }}>
+                    {product.name}
+                  </div>
 
                   {product.description && (
                     <div style={{ fontSize: 12, color: s.textMuted, lineHeight: 1.7, marginBottom: 12, flex: 1 }}>
@@ -218,7 +218,7 @@ export default function ProductsPage() {
                       <span style={{ fontSize: 11, color: s.textMuted, marginRight: 4 }}>تومان</span>
                     </div>
                     <button
-                      onClick={() => handleAdd(product)}
+                      onClick={(e) => { e.stopPropagation(); handleAdd(product) }}
                       style={{
                         background: added === product.id ? s.greenLight : s.greenDark,
                         color: 'white', border: 'none', borderRadius: 12,
