@@ -1,14 +1,23 @@
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import { getToken } from "next-auth/jwt";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import AdminClient from "./AdminClient";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "admin@nozhin.ir";
 
 export default async function Admin() {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.email !== ADMIN_EMAIL) redirect("/login");
+  const cookieStore = await cookies();
+  const sessionToken =
+    cookieStore.get("next-auth.session-token")?.value ??
+    cookieStore.get("__Secure-next-auth.session-token")?.value;
+
+  const token = await getToken({
+    req: { cookies: { "next-auth.session-token": sessionToken, "__Secure-next-auth.session-token": sessionToken } } as any,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+
+  if (!token || token.email !== ADMIN_EMAIL) redirect("/login");
 
   const [products, orders, userList, routines, coupons] = await Promise.all([
     prisma.product.findMany({ orderBy: { createdAt: "desc" } }),
