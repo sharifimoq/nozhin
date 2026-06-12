@@ -149,8 +149,15 @@ export default function Quiz() {
     }}>
       <div style={{ width: '100%', maxWidth: '560px' }}>
 
-        {/* لوگو */}
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+        {/* لوگو + دکمه خانه */}
+        <div style={{ textAlign: 'center', marginBottom: 32, position: 'relative' }}>
+          <a href="/" style={{
+            position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
+            fontSize: 12, color: s.textMuted, textDecoration: 'none',
+            display: 'flex', alignItems: 'center', gap: 4,
+          }}>
+            ← خانه
+          </a>
           <a href="/" style={{ textDecoration: 'none', fontSize: 26, fontWeight: 900, color: s.greenDark }}>
             نوژ<span style={{ color: s.greenLight }}>ین</span>
           </a>
@@ -262,12 +269,20 @@ export default function Quiz() {
                     مشاهده سبد خرید
                   </a>
                 </div>
-                <a href="/products" style={{
-                  textAlign: 'center', fontSize: 12, color: s.textMuted,
-                  textDecoration: 'none', padding: '8px',
-                }}>
-                  مشاهده همه محصولات ←
-                </a>
+                <div style={{ display: 'flex', gap: 10 }}>
+                  <a href="/" style={{
+                    flex: 1, textAlign: 'center', fontSize: 12, color: s.textMuted,
+                    textDecoration: 'none', padding: '8px',
+                  }}>
+                    ← برگشت به خانه
+                  </a>
+                  <a href="/products" style={{
+                    flex: 1, textAlign: 'center', fontSize: 12, color: s.textMuted,
+                    textDecoration: 'none', padding: '8px',
+                  }}>
+                    همه محصولات ←
+                  </a>
+                </div>
               </div>
             </div>
 
