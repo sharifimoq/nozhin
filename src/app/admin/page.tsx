@@ -8,8 +8,7 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? "admin@nozhin.ir";
 
 export default async function Admin() {
   const session = await getServerSession(authOptions);
-  if (!session) redirect("/login");
-  if (session.user.email !== ADMIN_EMAIL) redirect("/");
+  if (!session || session.user.email !== ADMIN_EMAIL) redirect("/login");
 
   const [products, orders, userList, routines, coupons] = await Promise.all([
     prisma.product.findMany({ orderBy: { createdAt: "desc" } }),
